@@ -10,4 +10,7 @@ public class Producer {
     public void send(ByteMessage defaultMessage){
 
     }
+    public void flush(){
+        System.out.println(1);
+    }
 }
