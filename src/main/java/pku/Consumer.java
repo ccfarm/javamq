@@ -10,7 +10,7 @@ public class Consumer {
     public void attachQueue(String queueName, Collection<String> topics) throws Exception {
 
     }
-    public ByteMessage poll(){
+    public ByteMessage poll()throws Exception{
         return null;
     }
 }

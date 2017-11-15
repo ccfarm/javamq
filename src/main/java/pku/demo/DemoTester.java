@@ -51,20 +51,25 @@ public class DemoTester {
 
         @Override
         public void run() {
-            for (int i = 0; i < topics.size(); i++) {
-                String topic = topics.get(i);
-                for (int j = 0; j < PUSH_COUNT; j++) {
-                    //topic加j作为数据部分
-                    //j是序号, 在consumer中会用来校验顺序
-                    byte[] data = (topic +" "+id + " " + j).getBytes();
-                    ByteMessage msg = producer.createBytesMessageToTopic(topics.get(i), data);
-                    //设置一个header
-                    msg.putHeaders(MessageHeader.SEARCH_KEY, "hello");
-                    //发送消息
-                    producer.send(msg);
-                    pushCount.incrementAndGet();
+            try {
+                for (int i = 0; i < topics.size(); i++) {
+                    String topic = topics.get(i);
+                    for (int j = 0; j < PUSH_COUNT; j++) {
+                        //topic加j作为数据部分
+                        //j是序号, 在consumer中会用来校验顺序
+                        byte[] data = (topic +" "+id + " " + j).getBytes();
+                        ByteMessage msg = producer.createBytesMessageToTopic(topics.get(i), data);
+                        //设置一个header
+                        msg.putHeaders(MessageHeader.SEARCH_KEY, "hello");
+                        //发送消息
+                        producer.send(msg);
+                        pushCount.incrementAndGet();
+                    }
                 }
+            }catch (Exception e){
+                e.printStackTrace();
             }
+
         }
     }
 
@@ -89,37 +94,43 @@ public class DemoTester {
 
         @Override
         public void run() {
-            //检查顺序, 保存每个topic-producer对应的序号, 新获得的序号必须严格+1
-            HashMap<String, Integer> posTable = new HashMap<>();
-            while (true) {
-                ByteMessage msg = consumer.poll();
-                if (msg == null) {
-                    System.out.println(String.format("thread pull %s",pc));
-                    return;
-                } else {
-                    byte[] data = msg.getBody();
-                    String str = new String(data);
-                    String[] strs = str.split(" ");
-                    String topic = strs[0];
-                    String prod = strs[1];
-                    int j = Integer.parseInt(strs[2]);
-                    String mapkey=topic+" "+prod;
-                    if (!posTable.containsKey(mapkey)) {
-                        posTable.put(mapkey, 0);
+
+            try {
+                //检查顺序, 保存每个topic-producer对应的序号, 新获得的序号必须严格+1
+                HashMap<String, Integer> posTable = new HashMap<>();
+                while (true) {
+                    ByteMessage msg = consumer.poll();
+                    if (msg == null) {
+                        System.out.println(String.format("thread pull %s",pc));
+                        return;
+                    } else {
+                        byte[] data = msg.getBody();
+                        String str = new String(data);
+                        String[] strs = str.split(" ");
+                        String topic = strs[0];
+                        String prod = strs[1];
+                        int j = Integer.parseInt(strs[2]);
+                        String mapkey=topic+" "+prod;
+                        if (!posTable.containsKey(mapkey)) {
+                            posTable.put(mapkey, 0);
+                        }
+                        if (j != posTable.get(mapkey)) {
+                            System.out.println(String.format("数据错误 topic %s 序号:%d", topic, j));
+                            System.exit(0);
+                        }
+                        if (!msg.headers().getString(MessageHeader.SEARCH_KEY).equals("hello")) {
+                            System.out.println(String.format("header错误 topic %s 序号:%d", topic, j));
+                            System.exit(0);
+                        }
+                        posTable.put(mapkey, posTable.get(mapkey) + 1);
+                        pullCount.incrementAndGet();
+                        pc++;
                     }
-                    if (j != posTable.get(mapkey)) {
-                        System.out.println(String.format("数据错误 topic %s 序号:%d", topic, j));
-                        System.exit(0);
-                    }
-                    if (!msg.headers().getString(MessageHeader.SEARCH_KEY).equals("hello")) {
-                        System.out.println(String.format("header错误 topic %s 序号:%d", topic, j));
-                        System.exit(0);
-                    }
-                    posTable.put(mapkey, posTable.get(mapkey) + 1);
-                    pullCount.incrementAndGet();
-                    pc++;
                 }
+            }catch (Exception e){
+                e.printStackTrace();
             }
+
         }
     }
 
