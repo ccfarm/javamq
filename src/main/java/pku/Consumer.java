@@ -2,6 +2,7 @@ package pku;
 
 import java.util.*;
 import java.io.*;
+import java.util.concurrent.*;
 
 /**
  * Created by yangxiao on 2017/11/14.
@@ -21,13 +22,16 @@ public class Consumer {
     	topics.addAll(t);
     	for (Iterator<String> iter = t.iterator(); iter.hasNext(); ) {
     		String topic = iter.next();
-    		if (!store.containsKey(topic)) {
-    			readTopic(topic);
-    		}
+    		synchronized(this) {
+    			if (!store.containsKey(topic)) {
+        			store.put(topic, new ArrayList<ByteMessage>());
+        			readTopic(topic);
+        		}
+    	   	 }
+    		
     	}
     }
-    public static synchronized void readTopic(String topic) throws Exception{
-    	store.put(topic, new ArrayList<ByteMessage>());
+    public static void readTopic(String topic) throws Exception{
 		File file = new File(topic);
 		Scanner input = new Scanner(file);
 		while (input.hasNext()) {
