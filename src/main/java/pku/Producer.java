@@ -36,11 +36,13 @@ public class Producer {
     		PrintWriter output = new PrintWriter(file);
     		for (Iterator iter2 = val.iterator(); iter2.hasNext();) {
     			ByteMessage msg = (DefaultMessage)iter2.next();
+    			//output.println("hello world!");
     			output.print(msg.getBody().length);
     			for (int i = 0; i < msg.getBody().length; i++) {
-    				output.print(' ' + msg.getBody()[i]);
+    				output.print(" " + msg.getBody()[i]);
     			}
     			output.println();
+    			output.close();
     		}
     	}
         System.out.println(1);
