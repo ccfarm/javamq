@@ -1,7 +1,7 @@
 package pku;
 import java.util.*;
 import java.io.*;
-
+import java.util.concurrent.*;
 /**
  * Created by yangxiao on 2017/11/14.
  */
@@ -28,10 +28,28 @@ public class Producer {
     	
     }
     public void flush()throws Exception{
+    	ExecutorService executor = Executors.newCachedThreadPool();
     	for (Iterator iter = store.entrySet().iterator(); iter.hasNext();) {
     		Map.Entry<String, ArrayList<ByteMessage>> entry = (Map.Entry<String, ArrayList<ByteMessage>>)iter.next();
     		String topic = entry.getKey();
     		ArrayList<ByteMessage> val = entry.getValue();
+    		executor.execute(new SaveTopic(topic, val));
+    		}
+    	
+        System.out.println(1);
+    }
+    
+    class SaveTopic implements Runnable{
+    	String topic;
+    	ArrayList<ByteMessage> val;
+    	public SaveTopic(String s, ArrayList<ByteMessage> t) {
+    		topic = s;
+    		val = t;
+    	}
+    	@Override
+    	public void run(){
+    		try {
+    		
     		File file = new File(topic);
     		PrintWriter output = new PrintWriter(file);
     		for (Iterator iter2 = val.iterator(); iter2.hasNext();) {
@@ -110,8 +128,12 @@ public class Producer {
     			}
     			output.println();
     			output.close();
-    		}
-    	}
-        System.out.println(1);
+    		}//for
+    		
+    		}//try
+    		catch (Exception e) {
+    		}//catch
+    		
+    	}//run
     }
 }

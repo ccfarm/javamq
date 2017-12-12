@@ -30,8 +30,8 @@ public class Consumer {
     	store.put(topic, new ArrayList<ByteMessage>());
 		File file = new File(topic);
 		Scanner input = new Scanner(file);
-		ByteMessage msg = new DefaultMessage();
 		while (input.hasNext()) {
+			ByteMessage msg = new DefaultMessage();
 			String key = input.next();
 			while (!key.equals("body")) {
 				int v1= 0;
