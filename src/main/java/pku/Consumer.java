@@ -30,14 +30,70 @@ public class Consumer {
     	store.put(topic, new ArrayList<ByteMessage>());
 		File file = new File(topic);
 		Scanner input = new Scanner(file);
+		ByteMessage msg = new DefaultMessage();
 		while (input.hasNext()) {
+			String key = input.next();
+			while (!key.equals("body")) {
+				int v1= 0;
+				long v2 = 0l;
+				String v3 = null;
+				if (key.equals(MessageHeader.MESSAGE_ID)) {
+					v3 = input.next();
+					msg.putHeaders(key, v3);
+				} else if (key.equals(MessageHeader.TOPIC)) {
+					v3 = input.next();
+					msg.putHeaders(key, v3);
+				} else if (key.equals(MessageHeader.BORN_TIMESTAMP)) {
+					v2 = input.nextLong();
+					msg.putHeaders(key, v2);
+				} else if (key.equals(MessageHeader.BORN_HOST)) {
+					v3 = input.next();
+					msg.putHeaders(key, v3);
+				} else if (key.equals(MessageHeader.STORE_TIMESTAMP)) {
+					v2 = input.nextLong();
+					msg.putHeaders(key, v2);
+				} else if (key.equals(MessageHeader.STORE_HOST)) {
+					v3 = input.next();
+					msg.putHeaders(key, v3);
+				} else if (key.equals(MessageHeader.START_TIME)) {
+					v2 = input.nextLong();
+					msg.putHeaders(key, v2);
+				} else if (key.equals(MessageHeader.STOP_TIME)) {
+					v2 = input.nextLong();
+					msg.putHeaders(key, v2);
+				} else if (key.equals(MessageHeader.TIMEOUT)) {
+					v2 = input.nextLong();
+					msg.putHeaders(key, v2);
+				} else if (key.equals(MessageHeader.PRIORITY)) {
+					v1 = input.nextInt();
+					msg.putHeaders(key, v1);
+				} else if (key.equals(MessageHeader.RELIABILITY)) {
+					v3 = input.next();
+					msg.putHeaders(key, v3);
+				} else if (key.equals(MessageHeader.SEARCH_KEY)) {
+					v3 = input.next();
+					msg.putHeaders(key, v3);
+				} else if (key.equals(MessageHeader.SCHEDULE_EXPRESSION)) {
+					v3 = input.next();
+					msg.putHeaders(key, v3);
+				} else if (key.equals(MessageHeader.SHARDING_KEY)) {
+					v3 = input.next();
+					msg.putHeaders(key, v3);
+				} else if (key.equals(MessageHeader.SHARDING_PARTITION)) {
+					v3 = input.next();
+					msg.putHeaders(key, v3);
+				} else if (key.equals(MessageHeader.TRACE_ID)) {
+					v3 = input.next();
+					msg.putHeaders(key, v3);
+				}
+				key = input.next();
+			}
 			int size = input.nextInt();
 			byte[] body = new byte[size];
 			for (int i = 0; i < size; i++) {
 				body[i] = input.nextByte();
 			};
-			ByteMessage msg = new DefaultMessage(body);
-			msg.putHeaders(MessageHeader.TOPIC, topic);
+			msg.setBody(body);
 			store.get(topic).add(msg);
 		}
 		input.close();
