@@ -101,6 +101,7 @@ public class Consumer {
 			store.get(topic).add(msg);
 		}
 		input.close();
+		//System.out.println("world");
     }
     public ByteMessage poll()throws Exception{
     	ByteMessage re = null;
@@ -108,6 +109,8 @@ public class Consumer {
     		re = pull(queue, topics.get(readPos));
     		if (re != null) {
     			break;
+    		} else {
+    			readPos += 1;
     		}
     	}
         return re;
