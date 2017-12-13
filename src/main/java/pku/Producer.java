@@ -27,7 +27,7 @@ public class Producer {
     	store.get(topic).add(msg);  
     	
     }
-    public void flush()throws Exception{
+    public static void flush()throws Exception{
     	for (Iterator iter = store.entrySet().iterator(); iter.hasNext();) {
     		Map.Entry<String, ArrayList<ByteMessage>> entry = (Map.Entry<String, ArrayList<ByteMessage>>)iter.next();
     		String topic = entry.getKey();
@@ -104,13 +104,14 @@ public class Producer {
     				output.println(MessageHeader.TRACE_ID + " "+ v3);
     			}
     			output.println("body");
-    			output.println(msg.getBody().length);
+    			output.print(msg.getBody().length);
     			for (int i = 0; i < msg.getBody().length; i++) {
     				output.print(" " + msg.getBody()[i]);
     			}
     			output.println();
-    			output.close();
     		}
+    		output.println();
+			output.close();
     	}
         System.out.println(1);
     }

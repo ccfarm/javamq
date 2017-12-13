@@ -22,17 +22,17 @@ public class Consumer {
     	topics.addAll(t);
     	for (Iterator<String> iter = t.iterator(); iter.hasNext(); ) {
     		String topic = iter.next();
-    		synchronized(this) {
-    			if (!store.containsKey(topic)) {
-        			store.put(topic, new ArrayList<ByteMessage>());
-        			readTopic(topic);
-        		}
-    	   	 }
-    		
+    		if (!store.containsKey(topic)) {
+        		store.put(topic, new ArrayList<ByteMessage>());
+       			readTopic(topic);
+       		}
     	}
     }
-    public static void readTopic(String topic) throws Exception{
+    public static synchronized void readTopic(String topic) throws Exception{
 		File file = new File(topic);
+		if (!file.exists()) {
+			return;
+		}
 		Scanner input = new Scanner(file);
 		while (input.hasNext()) {
 			ByteMessage msg = new DefaultMessage();
@@ -129,6 +129,5 @@ public class Consumer {
     		readPosForMap.put(k, pos + 1);
     		return msg;
     	}
-    	
     }
 }
