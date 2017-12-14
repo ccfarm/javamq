@@ -17,18 +17,15 @@ public class Producer {
     
     public void send(ByteMessage defaultMessage)throws Exception{
     	String topic = defaultMessage.headers().getString(MessageHeader.TOPIC);
-    	this.push(defaultMessage, topic);
-    }
-    
-    public void push(ByteMessage msg, String topic) throws Exception{
-    	if (msg == null) {
+    	if (defaultMessage == null) {
     		return;
     	}
     	if (!store.containsKey(topic)) {
     		store.put(topic, new ArrayList<ByteMessage>());		
     	}
-    	store.get(topic).add(msg);
+    	store.get(topic).add(defaultMessage);
     }
+
     
     public void flush() throws Exception{
     	for (Iterator iter = store.entrySet().iterator(); iter.hasNext();) {
@@ -123,7 +120,6 @@ public class Producer {
     			}
     			output.println();
     		}
-    		output.println();
 			output.close();
     	}
     	store.clear();
