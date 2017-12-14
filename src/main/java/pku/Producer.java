@@ -8,16 +8,18 @@ import java.io.*;
 public class Producer {
 	static HashMap<String, Integer> numOfTopic = new HashMap<>();
     HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
+    
     public ByteMessage createBytesMessageToTopic(String topic, byte[] body)throws Exception{
         ByteMessage msg = new DefaultMessage(body);
     	msg.putHeaders(MessageHeader.TOPIC, topic);
         return msg;
     }
+    
     public void send(ByteMessage defaultMessage)throws Exception{
     	String topic = defaultMessage.headers().getString(MessageHeader.TOPIC);
     	this.push(defaultMessage, topic);
     }
-
+    
     public void push(ByteMessage msg, String topic) throws Exception{
     	if (msg == null) {
     		return;
@@ -27,7 +29,8 @@ public class Producer {
     	}
     	store.get(topic).add(msg);
     }
-    public void flush()throws Exception{
+    
+    public void flush() throws Exception{
     	for (Iterator iter = store.entrySet().iterator(); iter.hasNext();) {
     		Map.Entry<String, ArrayList<ByteMessage>> entry = (Map.Entry<String, ArrayList<ByteMessage>>)iter.next();
     		String topic = entry.getKey();
@@ -123,6 +126,7 @@ public class Producer {
     		output.println();
 			output.close();
     	}
+    	store.clear();
         System.out.println(1);
     }
 }
