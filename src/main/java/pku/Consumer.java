@@ -9,6 +9,7 @@ import java.util.concurrent.*;
  */
 
 public class Consumer {
+	static HashSet<String> topicFlag = new HashSet<>();
 	List<String> topics = new LinkedList<>();
 	String queue;
 	static HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
@@ -23,14 +24,19 @@ public class Consumer {
     	//System.out.println("hello " + queue + topics.get(1));
     	for (Iterator<String> iter = t.iterator(); iter.hasNext(); ) {
     		String topic = iter.next();
-    		if (!store.containsKey(topic)) {
-        		store.put(topic, new ArrayList<ByteMessage>());
-       			readTopic(topic);
-       			//System.out.println(topic);
-       		}
+    		boolean flag = false;
+    		synchronized (store) {
+    			if (!store.containsKey(topic)) {
+    				store.put(topic, new ArrayList<ByteMessage>());
+    				flag = true;
+    			}
+    		}
+			if (flag){
+				this.readTopic(topic);
+			}
     	}
     }
-    public static synchronized void readTopic(String topic) throws Exception{
+    public void readTopic(String topic) throws Exception{
     	int index = 0;
     	while (true) {
     	index++;
@@ -117,7 +123,7 @@ public class Consumer {
     public ByteMessage poll()throws Exception{
     	ByteMessage re = null;
     	while (readPos < topics.size()) {
-    		re = pull(queue, topics.get(readPos));
+    		re = this.pull(queue, topics.get(readPos));
     		//System.out.println("hello " + queue + topics.get(readPos));
     		if (re != null) {
     			break;
@@ -129,7 +135,7 @@ public class Consumer {
         return re;
     }
     
-    public static ByteMessage pull(String queue, String topic) {
+    public synchronized ByteMessage pull(String queue, String topic) {
     	if (!store.containsKey(topic)) {
     		return null;
     	}
