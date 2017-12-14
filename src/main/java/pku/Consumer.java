@@ -12,7 +12,7 @@ public class Consumer {
 	List<String> topics = new LinkedList<>();
 	String queue;
 	static HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
-	static int readPos = 0;
+	int readPos = 0;
 	static HashMap<String, Integer> readPosForMap = new HashMap<>();
     public void attachQueue(String queueName, Collection<String> t) throws Exception {
     	if (queue != null) {
@@ -20,19 +20,25 @@ public class Consumer {
     	}
     	queue = queueName;
     	topics.addAll(t);
+    	//System.out.println("hello " + queue + topics.get(1));
     	for (Iterator<String> iter = t.iterator(); iter.hasNext(); ) {
     		String topic = iter.next();
     		if (!store.containsKey(topic)) {
         		store.put(topic, new ArrayList<ByteMessage>());
        			readTopic(topic);
+       			//System.out.println(topic);
        		}
     	}
     }
     public static synchronized void readTopic(String topic) throws Exception{
-		File file = new File(topic);
+    	int index = 0;
+    	while (true) {
+    	index++;
+		File file = new File(topic + index);
 		if (!file.exists()) {
 			return;
 		}
+		//System.out.println(topic);
 		Scanner input = new Scanner(file);
 		while (input.hasNext()) {
 			ByteMessage msg = new DefaultMessage();
@@ -91,39 +97,48 @@ public class Consumer {
 					msg.putHeaders(key, v3);
 				}
 				key = input.next();
-			}
+				//System.out.println(key);
+			}//while
 			int size = input.nextInt();
 			byte[] body = new byte[size];
 			for (int i = 0; i < size; i++) {
 				body[i] = input.nextByte();
-			};
+				//System.out.println(body[i]);
+			}
 			msg.setBody(body);
 			store.get(topic).add(msg);
 		}
 		input.close();
 		//System.out.println("world");
+		
+    	}//while
     }
+    
     public ByteMessage poll()throws Exception{
     	ByteMessage re = null;
     	while (readPos < topics.size()) {
     		re = pull(queue, topics.get(readPos));
+    		//System.out.println("hello " + queue + topics.get(readPos));
     		if (re != null) {
     			break;
     		} else {
     			readPos += 1;
     		}
+    		//System.out.println(readPos);
     	}
         return re;
     }
+    
     public static ByteMessage pull(String queue, String topic) {
+    	if (!store.containsKey(topic)) {
+    		return null;
+    	}
     	String k = queue + " " + topic;
     	if (!readPosForMap.containsKey(k)) {
     		readPosForMap.put(k, 0);
     	}
     	int pos = readPosForMap.get(k);
-    	if (!store.containsKey(topic)) {
-    		return null;
-    	}
+    	//System.out.println(queue + " " + topic + " "+ pos);
     	ArrayList<ByteMessage> list = store.get(topic);
     	if (list.size() <= pos) {
     		return null;

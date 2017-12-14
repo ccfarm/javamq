@@ -6,7 +6,8 @@ import java.io.*;
  * Created by yangxiao on 2017/11/14.
  */
 public class Producer {
-    static HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
+	static HashMap<String, Integer> numOfTopic = new HashMap<>();
+    HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
     public ByteMessage createBytesMessageToTopic(String topic, byte[] body)throws Exception{
         ByteMessage msg = new DefaultMessage(body);
     	msg.putHeaders(MessageHeader.TOPIC, topic);
@@ -14,25 +15,34 @@ public class Producer {
     }
     public void send(ByteMessage defaultMessage)throws Exception{
     	String topic = defaultMessage.headers().getString(MessageHeader.TOPIC);
-    	Producer.push(defaultMessage, topic);
+    	this.push(defaultMessage, topic);
     }
 
-    public static synchronized void push(ByteMessage msg, String topic) throws Exception{
+    public void push(ByteMessage msg, String topic) throws Exception{
     	if (msg == null) {
     		return;
     	}
     	if (!store.containsKey(topic)) {
     		store.put(topic, new ArrayList<ByteMessage>());		
     	}
-    	store.get(topic).add(msg);  
-    	
+    	store.get(topic).add(msg);
     }
-    public static void flush()throws Exception{
+    public void flush()throws Exception{
     	for (Iterator iter = store.entrySet().iterator(); iter.hasNext();) {
     		Map.Entry<String, ArrayList<ByteMessage>> entry = (Map.Entry<String, ArrayList<ByteMessage>>)iter.next();
     		String topic = entry.getKey();
     		ArrayList<ByteMessage> val = entry.getValue();
-    		File file = new File(topic);
+    		int index;
+    		synchronized (numOfTopic) {
+    			if (!numOfTopic.containsKey(topic)) {
+    				numOfTopic.put(topic, 1);
+    				index = 1;
+    			} else {
+    				index = numOfTopic.get(topic) + 1;
+    				numOfTopic.put(topic, index);
+    			}
+    		}
+    		File file = new File(topic + index);
     		PrintWriter output = new PrintWriter(file);
     		for (Iterator iter2 = val.iterator(); iter2.hasNext();) {
     			ByteMessage msg = (DefaultMessage)iter2.next();
