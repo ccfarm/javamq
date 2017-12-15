@@ -120,9 +120,10 @@ public class Producer {
 			output.writeDouble(v4);
 			output.writeChar('\n');
 		}
-		v3 = defaultMessage.headers().getString(MessageHeader.SHARDING_PARTITION);
-		if (v3 != null) {
-			output.writeChars(MessageHeader.SHARDING_PARTITION + "\n"+ v3 + "\n");
+		v4 = defaultMessage.headers().getDouble(MessageHeader.SHARDING_PARTITION);
+		if (v4 != null) {
+			output.writeChars(MessageHeader.SHARDING_PARTITION + "\n");
+			output.writeDouble(v4);
 		}
 		v3 = defaultMessage.headers().getString(MessageHeader.TRACE_ID);
 		if (v3 != null) {
