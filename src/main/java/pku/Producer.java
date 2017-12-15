@@ -21,8 +21,8 @@ public class Producer {
     	}
     	String topic = defaultMessage.headers().getString(MessageHeader.TOPIC);
     	
+    	int index = 1;
     	if (!nameOfFile.containsKey(topic)) {
-	    	int index;
 	    	synchronized (numOfTopic) {
 				if (!numOfTopic.containsKey(topic)) {
 					numOfTopic.put(topic, 1);
@@ -32,9 +32,8 @@ public class Producer {
 					numOfTopic.put(topic, index);
 				}
 			}
-	    	nameOfFile.put(topic, topic + index);
     	}
-    	
+    	nameOfFile.put(topic, topic + index);
     	RandomAccessFile output = new RandomAccessFile(nameOfFile.get(topic), "rw");
     	
     	output.seek(output.length());
@@ -42,9 +41,11 @@ public class Producer {
     	int v1 = 0;
 		long v2 = 0;
 		String v3 = null;
-		v3 = defaultMessage.headers().getString(MessageHeader.MESSAGE_ID);
-		if (v3 != null) {
-			output.writeChars(MessageHeader.MESSAGE_ID + "\n" + v3 + "\n");
+		v1 = defaultMessage.headers().getInt(MessageHeader.MESSAGE_ID);
+		if (v1 != 0) {
+			output.writeChars(MessageHeader.MESSAGE_ID + "\n");
+			output.writeInt(v1);
+			output.writeChar('\n');
 		}
 		v3 = defaultMessage.headers().getString(MessageHeader.TOPIC);
 		if (v3 != null) {
