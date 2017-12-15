@@ -45,6 +45,7 @@ public class Producer {
     	int v1 = 0;
 		long v2 = 0;
 		String v3 = null;
+		double v4 = 0;
 		v1 = defaultMessage.headers().getInt(MessageHeader.MESSAGE_ID);
 		if (v1 != 0) {
 			output.writeChars(MessageHeader.MESSAGE_ID + "\n");
@@ -113,9 +114,11 @@ public class Producer {
 		if (v3 != null) {
 			output.writeChars(MessageHeader.SCHEDULE_EXPRESSION + "\n"+ v3 + "\n");
 		}
-		v3 = defaultMessage.headers().getString(MessageHeader.SHARDING_KEY);
-		if (v3 != null) {
-			output.writeChars(MessageHeader.SHARDING_KEY + "\n"+ v3 + "\n");
+		v4 = defaultMessage.headers().getDouble(MessageHeader.SHARDING_KEY);
+		if (v4 != 0.0d) {
+			output.writeChars(MessageHeader.SHARDING_KEY + "\n");
+			output.writeDouble(v4);
+			output.writeChar('\n');
 		}
 		v3 = defaultMessage.headers().getString(MessageHeader.SHARDING_PARTITION);
 		if (v3 != null) {
