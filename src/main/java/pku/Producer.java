@@ -7,7 +7,7 @@ import java.io.*;
  */
 public class Producer {
 	static HashMap<String, Integer> numOfTopic = new HashMap<>();
-    HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
+	static HashMap<String, String> nameOfFile = new HashMap<>();
     
     public ByteMessage createBytesMessageToTopic(String topic, byte[] body)throws Exception{
         ByteMessage msg = new DefaultMessage(body);
@@ -20,116 +20,110 @@ public class Producer {
     		return;
     	}
     	String topic = defaultMessage.headers().getString(MessageHeader.TOPIC);
-    	if (!store.containsKey(topic)) {
-    		store.put(topic, new ArrayList<ByteMessage>());		
+    	
+    	if (!nameOfFile.containsKey(topic)) {
+	    	int index;
+	    	synchronized (numOfTopic) {
+				if (!numOfTopic.containsKey(topic)) {
+					numOfTopic.put(topic, 1);
+					index = 1;
+				} else {
+					index = numOfTopic.get(topic) + 1;
+					numOfTopic.put(topic, index);
+				}
+			}
+	    	nameOfFile.put(topic, topic + index);
     	}
-    	store.get(topic).add(defaultMessage);
-    }
-    
-    public void flush() throws Exception{
-    	Map.Entry<String, ArrayList<ByteMessage>> entry;
-    	String topic;
-    	ArrayList<ByteMessage> val;
-    	ByteMessage msg;
-    	File file;
-    	PrintWriter output;
-    	int index;
+    	
+    	RandomAccessFile output = new RandomAccessFile(nameOfFile.get(topic), "rw");
+    	
+    	output.seek(output.length());
+    	
     	int v1 = 0;
 		long v2 = 0;
 		String v3 = null;
-    	for (Iterator iter = store.entrySet().iterator(); iter.hasNext();) {
-    		entry = (Map.Entry<String, ArrayList<ByteMessage>>)iter.next();
-    		topic = entry.getKey();
-    		val = entry.getValue();
-    		
-    		synchronized (numOfTopic) {
-    			if (!numOfTopic.containsKey(topic)) {
-    				numOfTopic.put(topic, 1);
-    				index = 1;
-    			} else {
-    				index = numOfTopic.get(topic) + 1;
-    				numOfTopic.put(topic, index);
-    			}
-    		}
-    		
-    		file = new File(topic + index);
-    		output = new PrintWriter(file);
-    		for (Iterator iter2 = val.iterator(); iter2.hasNext();) {
-    			msg  = (DefaultMessage)iter2.next();
-    			v3 = msg.headers().getString(MessageHeader.MESSAGE_ID);
-    			if (v3 != null) {
-    				output.println(MessageHeader.MESSAGE_ID + " "+ v3);
-    			}
-    			v3 = msg.headers().getString(MessageHeader.TOPIC);
-    			if (v3 != null) {
-    				output.println(MessageHeader.TOPIC + " "+ v3);
-    			}
-    			v3 = msg.headers().getString(MessageHeader.BORN_TIMESTAMP);
-    			if (v3 != null) {
-    				output.println(MessageHeader.BORN_TIMESTAMP + " "+ v3);
-    			}
-    			v3 = msg.headers().getString(MessageHeader.BORN_HOST);
-    			if (v3 != null) {
-    				output.println(MessageHeader.BORN_HOST + " "+ v3);
-    			}
-    			v2 = msg.headers().getLong(MessageHeader.STORE_TIMESTAMP);
-    			if (v2 != 0L) {
-    				output.println(MessageHeader.STORE_TIMESTAMP + " "+ v2);
-    			}
-    			v3 = msg.headers().getString(MessageHeader.STORE_HOST);
-    			if (v3 != null) {
-    				output.println(MessageHeader.STORE_HOST + " "+ v3);
-    			}
-    			v2 = msg.headers().getLong(MessageHeader.START_TIME);
-    			if (v2 != 0L) {
-    				output.println(MessageHeader.START_TIME + " "+ v2);
-    			}
-    			v2 = msg.headers().getLong(MessageHeader.STOP_TIME);
-    			if (v2 != 0L) {
-    				output.println(MessageHeader.STOP_TIME + " "+ v2);
-    			}
-    			v2 = msg.headers().getLong(MessageHeader.TIMEOUT);
-    			if (v2 != 0L) {
-    				output.println(MessageHeader.TIMEOUT + " "+ v2);
-    			}
-    			v1 = msg.headers().getInt(MessageHeader.PRIORITY);
-    			if (v1 != 0) {
-    				output.println(MessageHeader.PRIORITY + " "+ v1);
-    			}
-    			v3 = msg.headers().getString(MessageHeader.RELIABILITY);
-    			if (v3 != null) {
-    				output.println(MessageHeader.RELIABILITY + " "+ v3);
-    			}
-    			v3 = msg.headers().getString(MessageHeader.SEARCH_KEY);
-    			if (v3 != null) {
-    				output.println(MessageHeader.SEARCH_KEY + " "+ v3);
-    			}
-    			v3 = msg.headers().getString(MessageHeader.SCHEDULE_EXPRESSION);
-    			if (v3 != null) {
-    				output.println(MessageHeader.SCHEDULE_EXPRESSION + " "+ v3);
-    			}
-    			v3 = msg.headers().getString(MessageHeader.SHARDING_KEY);
-    			if (v3 != null) {
-    				output.println(MessageHeader.SHARDING_KEY + " "+ v3);
-    			}
-    			v3 = msg.headers().getString(MessageHeader.SHARDING_PARTITION);
-    			if (v3 != null) {
-    				output.println(MessageHeader.SHARDING_PARTITION + " "+ v3);
-    			}
-    			v3 = msg.headers().getString(MessageHeader.TRACE_ID);
-    			if (v3 != null) {
-    				output.println(MessageHeader.TRACE_ID + " "+ v3);
-    			}
-    			output.println("body");
-    			output.print(msg.getBody().length);
-    			for (int i = 0; i < msg.getBody().length; i++) {
-    				output.print(" " + msg.getBody()[i]);
-    			}
-    			output.println();
-    		}
-			output.close();
-    	}//
-    	store.clear();
+		v3 = defaultMessage.headers().getString(MessageHeader.MESSAGE_ID);
+		if (v3 != null) {
+			output.writeChars(MessageHeader.MESSAGE_ID + "\n" + v3 + "\n");
+		}
+		v3 = defaultMessage.headers().getString(MessageHeader.TOPIC);
+		if (v3 != null) {
+			output.writeChars(MessageHeader.TOPIC + "\n"+ v3 + "\n");
+		}
+		v3 = defaultMessage.headers().getString(MessageHeader.BORN_TIMESTAMP);
+		if (v3 != null) {
+			output.writeChars(MessageHeader.BORN_TIMESTAMP + "\n"+ v3 + "\n");
+		}
+		v3 = defaultMessage.headers().getString(MessageHeader.BORN_HOST);
+		if (v3 != null) {
+			output.writeChars(MessageHeader.BORN_HOST + "\n"+ v3 + "\n");
+		}
+		v2 = defaultMessage.headers().getLong(MessageHeader.STORE_TIMESTAMP);
+		if (v2 != 0L) {
+			output.writeChars(MessageHeader.STORE_TIMESTAMP + "\n");
+			output.writeLong(v2);
+			output.writeChar('\n');
+		}
+		v3 = defaultMessage.headers().getString(MessageHeader.STORE_HOST);
+		if (v3 != null) {
+			output.writeChars(MessageHeader.STORE_HOST + "\n"+ v3 + "\n");
+		}
+		v2 = defaultMessage.headers().getLong(MessageHeader.START_TIME);
+		if (v2 != 0L) {
+			output.writeChars(MessageHeader.START_TIME + "\n");
+			output.writeLong(v2);
+			output.writeChar('\n');
+		}
+		v2 = defaultMessage.headers().getLong(MessageHeader.STOP_TIME);
+		if (v2 != 0L) {
+			output.writeChars(MessageHeader.STOP_TIME + "\n");
+			output.writeLong(v2);
+			output.writeChar('\n');
+		}
+		v2 = defaultMessage.headers().getLong(MessageHeader.TIMEOUT);
+		if (v2 != 0L) {
+			output.writeChars(MessageHeader.TIMEOUT + "\n");
+			output.writeLong(v2);
+			output.writeChar('\n');
+		}
+		v1 = defaultMessage.headers().getInt(MessageHeader.PRIORITY);
+		if (v1 != 0) {
+			output.writeChars(MessageHeader.PRIORITY + "\n");
+			output.writeInt(v1);
+			output.writeChar('\n');
+		}
+		v3 = defaultMessage.headers().getString(MessageHeader.RELIABILITY);
+		if (v3 != null) {
+			output.writeChars(MessageHeader.RELIABILITY + "\n"+ v3 + "\n");
+		}
+		v3 = defaultMessage.headers().getString(MessageHeader.SEARCH_KEY);
+		if (v3 != null) {
+			output.writeChars(MessageHeader.SEARCH_KEY + "\n"+ v3 + "\n");
+		}
+		v3 = defaultMessage.headers().getString(MessageHeader.SCHEDULE_EXPRESSION);
+		if (v3 != null) {
+			output.writeChars(MessageHeader.SCHEDULE_EXPRESSION + "\n"+ v3 + "\n");
+		}
+		v3 = defaultMessage.headers().getString(MessageHeader.SHARDING_KEY);
+		if (v3 != null) {
+			output.writeChars(MessageHeader.SHARDING_KEY + "\n"+ v3 + "\n");
+		}
+		v3 = defaultMessage.headers().getString(MessageHeader.SHARDING_PARTITION);
+		if (v3 != null) {
+			output.writeChars(MessageHeader.SHARDING_PARTITION + "\n"+ v3 + "\n");
+		}
+		v3 = defaultMessage.headers().getString(MessageHeader.TRACE_ID);
+		if (v3 != null) {
+			output.writeChars(MessageHeader.TRACE_ID + "\n"+ v3 + "\n");
+		}
+		output.writeChar('\r');
+		output.writeInt(defaultMessage.getBody().length);
+		output.write(defaultMessage.getBody());
+		output.close();
+    }
+    
+    public void flush() throws Exception{
+    	
         System.out.println(1);
     }
 }
