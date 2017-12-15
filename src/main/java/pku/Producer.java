@@ -51,9 +51,11 @@ public class Producer {
 		if (v3 != null) {
 			output.writeChars(MessageHeader.TOPIC + "\n"+ v3 + "\n");
 		}
-		v3 = defaultMessage.headers().getString(MessageHeader.BORN_TIMESTAMP);
-		if (v3 != null) {
-			output.writeChars(MessageHeader.BORN_TIMESTAMP + "\n"+ v3 + "\n");
+		v2 = defaultMessage.headers().getLong(MessageHeader.BORN_TIMESTAMP);
+		if (v2 != 0) {
+			output.writeChars(MessageHeader.BORN_TIMESTAMP + "\n");
+			output.writeLong(v2);
+			output.writeChar('\n');
 		}
 		v3 = defaultMessage.headers().getString(MessageHeader.BORN_HOST);
 		if (v3 != null) {
