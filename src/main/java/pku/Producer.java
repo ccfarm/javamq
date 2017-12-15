@@ -99,9 +99,11 @@ public class Producer {
 			output.writeInt(v1);
 			output.writeChar('\n');
 		}
-		v3 = defaultMessage.headers().getString(MessageHeader.RELIABILITY);
-		if (v3 != null) {
-			output.writeChars(MessageHeader.RELIABILITY + "\n"+ v3 + "\n");
+		v1 = defaultMessage.headers().getInt(MessageHeader.RELIABILITY);
+		if (v1 != 0) {
+			output.writeChars(MessageHeader.RELIABILITY + "\n");
+			output.writeInt(v1);
+			output.writeChar('\n');
 		}
 		v3 = defaultMessage.headers().getString(MessageHeader.SEARCH_KEY);
 		if (v3 != null) {
