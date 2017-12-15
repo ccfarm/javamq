@@ -121,7 +121,7 @@ public class Producer {
 			output.writeChar('\n');
 		}
 		v4 = defaultMessage.headers().getDouble(MessageHeader.SHARDING_PARTITION);
-		if (v4 != null) {
+		if (v4 != 0.0d) {
 			output.writeChars(MessageHeader.SHARDING_PARTITION + "\n");
 			output.writeDouble(v4);
 		}
