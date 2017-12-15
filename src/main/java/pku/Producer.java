@@ -16,23 +16,32 @@ public class Producer {
     }
     
     public void send(ByteMessage defaultMessage)throws Exception{
-    	String topic = defaultMessage.headers().getString(MessageHeader.TOPIC);
     	if (defaultMessage == null) {
     		return;
     	}
+    	String topic = defaultMessage.headers().getString(MessageHeader.TOPIC);
     	if (!store.containsKey(topic)) {
     		store.put(topic, new ArrayList<ByteMessage>());		
     	}
     	store.get(topic).add(defaultMessage);
     }
-
     
     public void flush() throws Exception{
+    	Map.Entry<String, ArrayList<ByteMessage>> entry;
+    	String topic;
+    	ArrayList<ByteMessage> val;
+    	ByteMessage msg;
+    	File file;
+    	PrintWriter output;
+    	int index;
+    	int v1 = 0;
+		long v2 = 0;
+		String v3 = null;
     	for (Iterator iter = store.entrySet().iterator(); iter.hasNext();) {
-    		Map.Entry<String, ArrayList<ByteMessage>> entry = (Map.Entry<String, ArrayList<ByteMessage>>)iter.next();
-    		String topic = entry.getKey();
-    		ArrayList<ByteMessage> val = entry.getValue();
-    		int index;
+    		entry = (Map.Entry<String, ArrayList<ByteMessage>>)iter.next();
+    		topic = entry.getKey();
+    		val = entry.getValue();
+    		
     		synchronized (numOfTopic) {
     			if (!numOfTopic.containsKey(topic)) {
     				numOfTopic.put(topic, 1);
@@ -42,13 +51,11 @@ public class Producer {
     				numOfTopic.put(topic, index);
     			}
     		}
-    		File file = new File(topic + index);
-    		PrintWriter output = new PrintWriter(file);
+    		
+    		file = new File(topic + index);
+    		output = new PrintWriter(file);
     		for (Iterator iter2 = val.iterator(); iter2.hasNext();) {
-    			ByteMessage msg = (DefaultMessage)iter2.next();
-    			int v1 = 0;
-    			long v2 = 0;
-    			String v3 = null;
+    			msg  = (DefaultMessage)iter2.next();
     			v3 = msg.headers().getString(MessageHeader.MESSAGE_ID);
     			if (v3 != null) {
     				output.println(MessageHeader.MESSAGE_ID + " "+ v3);
@@ -121,7 +128,7 @@ public class Producer {
     			output.println();
     		}
 			output.close();
-    	}
+    	}//
     	store.clear();
         System.out.println(1);
     }
