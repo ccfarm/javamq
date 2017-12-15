@@ -7,7 +7,7 @@ import java.io.*;
  */
 public class Producer {
 	static HashMap<String, Integer> numOfTopic = new HashMap<>();
-	static HashMap<String, String> nameOfFile = new HashMap<>();
+	HashMap<String, String> nameOfFile = new HashMap<>();
     
     public ByteMessage createBytesMessageToTopic(String topic, byte[] body)throws Exception{
         ByteMessage msg = new DefaultMessage(body);
@@ -21,8 +21,10 @@ public class Producer {
     	}
     	String topic = defaultMessage.headers().getString(MessageHeader.TOPIC);
     	
-    	int index = 1;
+    	
+    	
     	if (!nameOfFile.containsKey(topic)) {
+    		int index = 1;
 	    	synchronized (numOfTopic) {
 				if (!numOfTopic.containsKey(topic)) {
 					numOfTopic.put(topic, 1);
@@ -32,8 +34,10 @@ public class Producer {
 					numOfTopic.put(topic, index);
 				}
 			}
+	    	nameOfFile.put(topic, topic + index);
     	}
-    	nameOfFile.put(topic, topic + index);
+    	
+
     	RandomAccessFile output = new RandomAccessFile(nameOfFile.get(topic), "rw");
     	
     	output.seek(output.length());
@@ -83,10 +87,10 @@ public class Producer {
 			output.writeLong(v2);
 			output.writeChar('\n');
 		}
-		v2 = defaultMessage.headers().getLong(MessageHeader.TIMEOUT);
-		if (v2 != 0L) {
+		v1 = defaultMessage.headers().getInt(MessageHeader.TIMEOUT);
+		if (v1 != 0) {
 			output.writeChars(MessageHeader.TIMEOUT + "\n");
-			output.writeLong(v2);
+			output.writeInt(v1);
 			output.writeChar('\n');
 		}
 		v1 = defaultMessage.headers().getInt(MessageHeader.PRIORITY);
