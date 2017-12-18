@@ -30,9 +30,10 @@ public class MessageStore {
 		if (buf.remaining() == CAPACITY) {
 			return;
 		}
-		RandomAccessFile rf = new RandomAccessFile("data/" + filename + index, "rw");
+		RandomAccessFile rf = new RandomAccessFile("data/" + filename + "+" +index, "rw");
 		index++;
-		byte[] bytes = new byte[CAPACITY - buf.remaining()];
+		buf.put((byte)17);
+		byte[] bytes = new byte[CAPACITY];
 		buf.position(0);
 		buf.get(bytes);
 		rf.write(bytes);
@@ -130,6 +131,7 @@ public class MessageStore {
 			buf.put((byte)16);
 			putString(v3);
 		}
+		buf.put((byte)18);
 		buf.putInt(defaultMessage.getBody().length);
 		buf.put(defaultMessage.getBody());
 		

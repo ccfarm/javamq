@@ -26,11 +26,11 @@ public class Producer {
     	String topic = defaultMessage.headers().getString(MessageHeader.TOPIC);
     	
     	if (!bufs.containsKey(topic)) {
-    		int index = 1;
+    		int index;
 	    	synchronized (numOfTopic) {
 				if (!numOfTopic.containsKey(topic)) {
-					numOfTopic.put(topic, 1);
-					index = 1;
+					numOfTopic.put(topic, 0);
+					index = 0;
 				} else {
 					index = numOfTopic.get(topic) + 1;
 					numOfTopic.put(topic, index);
