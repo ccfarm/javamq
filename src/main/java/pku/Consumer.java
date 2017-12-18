@@ -127,7 +127,8 @@ public class Consumer {
     	rf.read(bytes);
     	rf.close();
     	buf.clear();
-    	buf = ByteBuffer.wrap(bytes);
+    	buf.put(bytes);
+    	buf.position(0);
     	//System.out.println(buf.position());
     	return false;
     }//readBuf
