@@ -126,9 +126,9 @@ public class Consumer {
     	byte[] bytes = new byte[MessageStore.CAPACITY];
     	rf.read(bytes);
     	rf.close();
-    	buf.clear();
-    	buf.put(bytes);
-    	buf.position(0);
+    	
+    	buf = ByteBuffer.wrap(bytes);
+    	
     	//System.out.println(buf.position());
     	return false;
     }//readBuf
