@@ -33,6 +33,7 @@ public class MessageStore {
 		RandomAccessFile rf = new RandomAccessFile("data/" + filename + index, "rw");
 		index++;
 		byte[] bytes = new byte[CAPACITY - buf.remaining()];
+		buf.position(0);
 		buf.get(bytes);
 		rf.write(bytes);
 		rf.close();
