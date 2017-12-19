@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 
 public class MessageStore {
 	
-	static final int CAPACITY = 60 * 1024 * 1024;
+	static final int CAPACITY = 100 * 1024 * 1024;
 	String filename;
 	ByteBuffer buf;
 	int index;
