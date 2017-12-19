@@ -34,7 +34,7 @@ public class Consumer {
     }
     
     public ByteMessage poll()throws Exception{
-    	if (topic = null) {
+    	if (topic == null) {
 			return null;
 		}
     	byte key = buf.get();
