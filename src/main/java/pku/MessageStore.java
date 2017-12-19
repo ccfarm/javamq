@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 
 public class MessageStore {
 	
-	static final int CAPACITY = 50 * 1024 * 1024;
+	static final int CAPACITY = 100 * 1024 * 1024;
 	String filename;
 	ByteBuffer buf;
 	int index;
@@ -135,7 +135,7 @@ public class MessageStore {
 		buf.putInt(defaultMessage.getBody().length);
 		buf.put(defaultMessage.getBody());
 		
-		if (buf.remaining() <= 205 * 1024) {
+		if (buf.remaining() <= 210 * 1024) {
 			write();
 		}
 		
