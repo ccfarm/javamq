@@ -17,6 +17,7 @@ public class Consumer {
 	int index1 = 0;
 	int index2 = 0;
 	String topic = null;
+	boolean flag = true;
 	//static HashMap<String, Integer> readPosForMap = new HashMap<>();
 	//static HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
 	
@@ -28,14 +29,15 @@ public class Consumer {
     	queue = queueName;
     	topics.addAll(t);
     	topic = topics.get(0);
-    	if (readBuf()) {
-			return;
-		}
+    	
     }
     
     public ByteMessage poll()throws Exception{
-    	if (topic == null) {
-			return null;
+		if (flag) {
+			flag = false;
+			if (readBuf()) {
+				return null;
+			}
 		}
     	byte key = buf.get();
     	while (key == 17) {
