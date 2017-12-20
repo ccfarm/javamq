@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 public class Producer {
 	
 	static HashMap<String, Integer> numOfTopic = new HashMap<>();
-	static final int CAPACITY = 120 * 1024 * 1024;
+	static final int CAPACITY = 150 * 1024 * 1024;
 	ByteBuffer buf;
 	String currentTopic = null;
 	
