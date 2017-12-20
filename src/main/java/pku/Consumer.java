@@ -10,16 +10,20 @@ import java.util.concurrent.*;
  */
 
 public class Consumer {
-	ByteBuffer buf = ByteBuffer.allocateDirect(MessageStore.CAPACITY);
+	ByteBuffer buf;
 	List<String> topics = new LinkedList<>();
-	String queue;
-	int readPos = 0;
-	int index1 = 0;
-	int index2 = 0;
-	String topic = null;
+	String queue = null;
+	int readPos;
+	int index;
+	boolean flag = false;
+	//String topic = null;
 	//static HashMap<String, Integer> readPosForMap = new HashMap<>();
 	//static HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
-	
+	public Consumer() {
+		readPos = 0;
+		index = 0;
+		buf = ByteBuffer.allocateDirect(Producer.CAPACITY);
+	}
 	
     public void attachQueue(String queueName, Collection<String> t) throws Exception {
     	if (queue != null) {
@@ -27,15 +31,18 @@ public class Consumer {
     	}
     	queue = queueName;
     	topics.addAll(t);
-    	topic = topics.get(0);
-    	if (readBuf()) {
-			return;
-		}
+    	//topic = topics.get(0);
+    	
+    	//System.out.println("topicsize"+topics.size());
+    	readBuf();
     }
     
     public ByteMessage poll()throws Exception{
-    	
+    	if (flag) {
+    		return null;
+    	}
     	byte key = buf.get();
+    	//System.out.println(key);
     	while (key == 17) {
     		if (readBuf()) {
     			return null;
@@ -103,44 +110,43 @@ public class Consumer {
     }
     
     public boolean readBuf() throws Exception {
-    	File file = new File("data/" + index1 + topic + "+" +index2);
-    	
+    	//System.out.println(queue + "queue" + buf.position() + "  buf "+buf.get());
+    	//System.out.println(readPos + "topicsize"+topics.size());
+    	//if (readPos >= topics.size()) {
+    		//flag = true;
+			//return true;
+		//}
+    	File file = new File("data/" + topics.get(readPos) + "+" + index);
+    	//System.out.println("data/" + topics.get(readPos) + "+" + index);
     	while (!file.exists()) {
-    		if (index2 != 0) {
-    			index1 ++;
-    			index2 = 0;
-    		} else {
-    			index1 = 0;
-    			index2 = 0;
-    			readPos += 1;
-    			if (readPos >= topics.size()) {
-    				return true;
-    			}
-    			topic = topics.get(readPos);
-    		}
-    		file = new File("data/" + index1 + topic + "+" +index2);
+    		index = 0;
+    		readPos += 1;
+    		if (readPos >= topics.size()) {
+    			flag = true;
+   				return true;
+   			}
+   			//topic = topics.get(readPos);   	
+    		file = new File("data/" + topics.get(readPos) + "+" + index);
     	}
+    	//System.out.println(queue + "queue" + buf.position() + "  buf "+buf.get());
     	
-    	RandomAccessFile rf = new RandomAccessFile("data/" + index1 + topic +"+" +index2, "r");
-    	index2++;
-    	byte[] bytes = new byte[MessageStore.CAPACITY];
+    	RandomAccessFile rf = new RandomAccessFile("data/" + topics.get(readPos) + "+" + index, "r");
+    	index++;
+    	byte[] bytes = new byte[Producer.CAPACITY];
     	rf.read(bytes);
     	rf.close();
     	
     	buf = ByteBuffer.wrap(bytes);
     	
-    	//System.out.println(buf.position());
+    	//System.out.println("queueName" + queue);
     	return false;
     }//readBuf
     
     public String getString() {
-    	StringBuffer sBuf = new StringBuffer();
-    	char c = buf.getChar();
-    	while (c != '\n') {
-    		sBuf.append(c);
-    		c = buf.getChar();
-    	}
-    	return sBuf.toString();
+    	int l = buf.getInt();
+		byte[] bs =  new byte[l];
+		buf.get(bs);
+		return new String(bs);
     }//getString
     
 
