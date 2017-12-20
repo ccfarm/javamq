@@ -135,7 +135,7 @@ public class MessageStore {
 		buf.putInt(defaultMessage.getBody().length);
 		buf.put(defaultMessage.getBody());
 		
-		if (buf.remaining() <= 205 * 1024) {
+		if (buf.remaining() <= 201 * 1024) {
 			write();
 		}
 		
