@@ -9,12 +9,13 @@ import java.nio.ByteBuffer;
 public class Producer {
 	
 	static HashMap<String, Integer> numOfTopic = new HashMap<>();
-	static final int CAPACITY = 150 * 1024 * 1024;
+	static final int CAPACITY = 200 * 1024 * 1024;
 	ByteBuffer buf;
 	String currentTopic = null;
 	
 	public Producer() {
 		buf = ByteBuffer.allocateDirect(CAPACITY);
+		buf.putInt(1);
 	}
 	
     public ByteMessage createBytesMessageToTopic(String topic, byte[] body)throws Exception{
@@ -152,14 +153,16 @@ public class Producer {
     
     public void write() throws Exception {
     	//System.out.println(1);
-		if (buf.remaining() == CAPACITY) {
+		if (buf.remaining() == CAPACITY - 4) {
 			return;
 		}
 		RandomAccessFile rf = new RandomAccessFile("data/" + currentTopic + "+" + numOfTopic.get(currentTopic), "rw");
 		buf.put((byte)17);//17 means the end of this file and to be continue
-		byte[] bytes = new byte[CAPACITY];
+		int pos = buf.position();
+		byte[] bytes = new byte[pos];
 		buf.position(0);
 		buf.get(bytes);
+		rf.writeInt(pos);
 		rf.write(bytes);
 		rf.close();
 		buf.clear();

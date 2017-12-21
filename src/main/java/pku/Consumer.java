@@ -16,6 +16,7 @@ public class Consumer {
 	int readPos;
 	int index;
 	boolean flag = false;
+	static String clock = "clock";
 	//String topic = null;
 	//static HashMap<String, Integer> readPosForMap = new HashMap<>();
 	//static HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
@@ -129,12 +130,15 @@ public class Consumer {
     		file = new File("data/" + topics.get(readPos) + "+" + index);
     	}
     	//System.out.println(queue + "queue" + buf.position() + "  buf "+buf.get());
-    	
-    	RandomAccessFile rf = new RandomAccessFile("data/" + topics.get(readPos) + "+" + index, "r");
-    	index++;
-    	byte[] bytes = new byte[Producer.CAPACITY];
-    	rf.read(bytes);
-    	rf.close();
+    	byte[] bytes;
+    	synchronized (clock) {
+    		RandomAccessFile rf = new RandomAccessFile("data/" + topics.get(readPos) + "+" + index, "r");
+    		//System.out.println("data/" + topics.get(readPos) + "+" + index);
+    		index++;
+    		bytes = new byte[rf.readInt()];
+    		rf.read(bytes);
+    		rf.close();
+    	}
     	
     	buf = ByteBuffer.wrap(bytes);
     	
