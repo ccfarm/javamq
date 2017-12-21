@@ -4,19 +4,20 @@ import java.util.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.*;
 
 /**
  * Created by yangxiao on 2017/11/14.
  */
 
 public class Consumer {
+	static Lock lock = new ReentrantLock();
 	ByteBuffer buf;
 	List<String> topics = new LinkedList<>();
 	String queue = null;
 	int readPos;
 	int index;
 	boolean flag = false;
-	static String clock = "clock";
 	//String topic = null;
 	//static HashMap<String, Integer> readPosForMap = new HashMap<>();
 	//static HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
@@ -131,15 +132,14 @@ public class Consumer {
     	}
     	//System.out.println(queue + "queue" + buf.position() + "  buf "+buf.get());
     	byte[] bytes;
-    	synchronized (clock) {
-    		RandomAccessFile rf = new RandomAccessFile("data/" + topics.get(readPos) + "+" + index, "r");
-    		//System.out.println("data/" + topics.get(readPos) + "+" + index);
-    		index++;
-    		bytes = new byte[rf.readInt()];
-    		rf.read(bytes);
-    		rf.close();
-    	}
-    	
+    	lock.lock();
+    	RandomAccessFile rf = new RandomAccessFile("data/" + topics.get(readPos) + "+" + index, "r");
+    	//System.out.println("data/" + topics.get(readPos) + "+" + index);
+    	bytes = new byte[rf.readInt()];
+    	rf.read(bytes);
+    	rf.close();
+    	lock.unlock();
+    	index++;
     	buf = ByteBuffer.wrap(bytes);
     	
     	//System.out.println("queueName" + queue);
