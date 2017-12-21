@@ -181,7 +181,7 @@ public class Producer {
 		byte[] bytes = new byte[pos];
 		buf.position(0);
 		buf.get(bytes);
-		bytes = compress(bytes);
+		//bytes = compress(bytes);
 		rf.writeInt(bytes.length);
 		rf.write(bytes);
 		rf.close();

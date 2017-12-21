@@ -5,6 +5,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.*;
+import java.util.zip.Inflater;
 
 /**
  * Created by yangxiao on 2017/11/14.
@@ -139,6 +140,7 @@ public class Consumer {
     	rf.read(bytes);
     	rf.close();
     	lock.unlock();
+    	//bytes = decompress(bytes);
     	index++;
     	buf = ByteBuffer.wrap(bytes);
     	
@@ -153,5 +155,33 @@ public class Consumer {
 		return new String(bs);
     }//getString
     
+    public static byte[] decompress(byte[] data) {
+        byte[] output = new byte[0];
 
+        Inflater decompresser = new Inflater();
+        decompresser.reset();
+        decompresser.setInput(data);
+
+        ByteArrayOutputStream o = new ByteArrayOutputStream(data.length);
+        try {
+            byte[] buf = new byte[1024];
+            while (!decompresser.finished()) {
+                int i = decompresser.inflate(buf);
+                o.write(buf, 0, i);
+            }
+            output = o.toByteArray();
+        } catch (Exception e) {
+            output = data;
+            e.printStackTrace();
+        } finally {
+            try {
+                o.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        decompresser.end();
+        return output;
+    }
 }
