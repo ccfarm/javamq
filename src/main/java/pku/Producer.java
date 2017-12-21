@@ -3,8 +3,8 @@ import java.util.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
+//import java.util.zip.Deflater;
+//import java.util.zip.Inflater;
 
 /**
  * Created by yangxiao on 2017/11/14.
@@ -15,10 +15,10 @@ public class Producer {
 	static final int CAPACITY = 200 * 1024 * 1024;
 	ByteBuffer buf;
 	String currentTopic = null;
+	int index;
 	
 	public Producer() {
 		buf = ByteBuffer.allocateDirect(CAPACITY);
-		buf.putInt(1);
 	}
 	
     public ByteMessage createBytesMessageToTopic(String topic, byte[] body)throws Exception{
@@ -35,7 +35,7 @@ public class Producer {
     	
     	String topic = defaultMessage.headers().getString(MessageHeader.TOPIC);
     	
-    	if (currentTopic != topic) {
+    	if (topic != currentTopic) {
     		if (currentTopic != null) {
     			//write buffer to file start
     			this.write();
@@ -50,6 +50,7 @@ public class Producer {
 				} else {
 					numOfTopic.put(topic, numOfTopic.get(topic) + 1);
 				}
+				index = numOfTopic.get(topic);
 			}// syn
     	}// if current
     	
@@ -175,7 +176,7 @@ public class Producer {
 		if (buf.remaining() == CAPACITY - 4) {
 			return;
 		}
-		RandomAccessFile rf = new RandomAccessFile("data/" + currentTopic + "+" + numOfTopic.get(currentTopic), "rw");
+		RandomAccessFile rf = new RandomAccessFile("data/" + currentTopic + "+" + index, "rw");
 		buf.put((byte)17);//17 means the end of this file and to be continue
 		int pos = buf.position();
 		byte[] bytes = new byte[pos];
@@ -191,9 +192,13 @@ public class Producer {
     
     public void putString(String st) {
     	
-    	buf.putInt(st.length());
+    	buf.putInt(st.getBytes().length);
 		buf.put(st.getBytes());
 	}
+
+    
+    /**
+     * Created by yangxiao on 2017/11/14.
     
     public static byte[] compress(byte[] data) {
         byte[] output = new byte[0];
@@ -224,5 +229,9 @@ public class Producer {
         compresser.end();
         return output;
     }
+    
+
+ * Created by yangxiao on 2017/11/14.
+ */
     
 }

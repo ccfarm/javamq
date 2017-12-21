@@ -3,16 +3,16 @@ package pku;
 import java.util.*;
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.concurrent.*;
-import java.util.concurrent.locks.*;
-import java.util.zip.Inflater;
+//import java.util.concurrent.*;
+//import java.util.concurrent.locks.*;
+//import java.util.zip.Inflater;
 
 /**
  * Created by yangxiao on 2017/11/14.
  */
 
 public class Consumer {
-	static Lock lock = new ReentrantLock();
+	//static Lock lock = new ReentrantLock();
 	ByteBuffer buf;
 	List<String> topics = new LinkedList<>();
 	String queue = null;
@@ -133,13 +133,13 @@ public class Consumer {
     	}
     	//System.out.println(queue + "queue" + buf.position() + "  buf "+buf.get());
     	byte[] bytes;
-    	lock.lock();
+    	//lock.lock();
     	RandomAccessFile rf = new RandomAccessFile("data/" + topics.get(readPos) + "+" + index, "r");
     	//System.out.println("data/" + topics.get(readPos) + "+" + index);
     	bytes = new byte[rf.readInt()];
     	rf.read(bytes);
     	rf.close();
-    	lock.unlock();
+    	//lock.unlock();
     	//bytes = decompress(bytes);
     	index++;
     	buf = ByteBuffer.wrap(bytes);
@@ -154,7 +154,10 @@ public class Consumer {
 		buf.get(bs);
 		return new String(bs);
     }//getString
-    
+
+    /**
+     * Created by yangxiao on 2017/11/14.
+     
     public static byte[] decompress(byte[] data) {
         byte[] output = new byte[0];
 
@@ -184,4 +187,8 @@ public class Consumer {
         decompresser.end();
         return output;
     }
+    
+   
+ * Created by yangxiao on 2017/11/14.
+ */
 }
