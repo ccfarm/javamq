@@ -50,7 +50,7 @@ public class MessageStore {
 	
 	public void writeEnd() throws Exception {
 		write();
-		writeInt(0);
+		writeInt(-1);
 		//output.flush();
 		output.close();
 	}

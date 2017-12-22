@@ -116,11 +116,14 @@ public class Consumer {
     	
     	//System.out.println("hello" + l);
     	
-    	while (l == 0) {
+    	while (l == -1) {
+    		
+    		readFile();
+    		
     		if (flag){
         		return true;
         	}
-    		readFile();
+    		l = readInt();
     	}
 
     	
@@ -150,6 +153,9 @@ public class Consumer {
     }
     
     public void readFile() throws Exception{
+    	if (input != null){
+    		input.close();
+    	}
     	File file = new File("data/" + index + topics.get(readPos));
     	
     	while (!file.exists()) {
@@ -162,6 +168,8 @@ public class Consumer {
     		//topic = topics.get(readPos);
     		file = new File("data/" + index + topics.get(readPos));
     	}
+    	
+    	
     	index++;
     	input = new BufferedInputStream(new FileInputStream(file), 5 * 1024 * 1024);
     	//System.out.println("hello world");
