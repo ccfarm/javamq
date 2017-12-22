@@ -8,7 +8,7 @@ import java.io.*;
 
 public class MessageStore {
 	
-	static final int CAPACITY = 10000 * 1024;
+	static final int CAPACITY = 10 * 1024 * 1024;
 	//String filename;
 	ByteBuffer buf;
 	//int index;
@@ -22,7 +22,7 @@ public class MessageStore {
 		buf = ByteBuffer.allocateDirect(CAPACITY);
 		file = new File("data/" +filename);
 		//System.out.println("data/" +filename);
-		output = new BufferedOutputStream(new FileOutputStream(file), 4660 * 1024);
+		output = new BufferedOutputStream(new FileOutputStream(file), 5 * 1024 * 1024);
 	}
 	
 	
