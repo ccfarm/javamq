@@ -23,7 +23,7 @@ public class MessageStore {
 	
 	
 	public void putString(String st) {
-    	buf.putInt(st.getBytes().length);
+    	buf.put(（byte）st.getBytes().length);
 		buf.put(st.getBytes());
 	}
 	
