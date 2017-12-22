@@ -9,7 +9,7 @@ import java.io.*;
 
 public class MessageStore {
 	
-	static final int CAPACITY = 5 * 1024 * 1024;
+	static final int CAPACITY =  4658 * 1024;
 	String filename;
 	ByteBuffer buf;
 	int index;
@@ -23,7 +23,7 @@ public class MessageStore {
 	
 	
 	public void putString(String st) {
-    	buf.putInt(st.getBytes().length);
+    	buf.put(（byte）st.getBytes().length);
 		buf.put(st.getBytes());
 	}
 	
@@ -37,7 +37,7 @@ public class MessageStore {
 		byte[] bytes = new byte[buf.position()];
 		buf.position(0);
 		buf.get(bytes);
-		//bytes = compress(bytes);
+		bytes = compress(bytes);
 		RandomAccessFile rf = new RandomAccessFile("data/" + filename + "+" +index, "rw");
 		//FileOutputStream rf = new FileOutputStream("data/" + filename + "+" +index, true);
 		index++;

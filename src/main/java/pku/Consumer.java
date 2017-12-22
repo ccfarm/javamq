@@ -142,7 +142,7 @@ public class Consumer {
     }//readBuf
     
     public String getString() {
-    	int l = buf.getInt();
+    	byte l = buf.get();
 		byte[] bs =  new byte[l];
 		buf.get(bs);
 		return new String(bs);
