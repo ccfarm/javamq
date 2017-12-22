@@ -3,30 +3,25 @@ package pku;
 import java.util.*;
 import java.io.*;
 import java.nio.ByteBuffer;
-//import java.util.concurrent.*;
-//import java.util.concurrent.locks.*;
-//import java.util.zip.Inflater;
+import java.util.concurrent.*;
+import java.util.zip.Inflater;
 
 /**
  * Created by yangxiao on 2017/11/14.
  */
 
 public class Consumer {
-	//static Lock lock = new ReentrantLock();
-	ByteBuffer buf;
+	ByteBuffer buf = ByteBuffer.allocateDirect(MessageStore.CAPACITY);
 	List<String> topics = new LinkedList<>();
-	String queue = null;
-	int readPos;
-	int index;
+	String queue;
+	int readPos = 0;
+	int index1 = 0;
+	int index2 = 0;
+	String topic = null;
 	boolean flag = false;
-	//String topic = null;
 	//static HashMap<String, Integer> readPosForMap = new HashMap<>();
 	//static HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
-	public Consumer() {
-		readPos = 0;
-		index = 0;
-		buf = ByteBuffer.allocateDirect(Producer.CAPACITY);
-	}
+	
 	
     public void attachQueue(String queueName, Collection<String> t) throws Exception {
     	if (queue != null) {
@@ -34,18 +29,17 @@ public class Consumer {
     	}
     	queue = queueName;
     	topics.addAll(t);
-    	//topic = topics.get(0);
-    	
-    	//System.out.println("topicsize"+topics.size());
-    	readBuf();
+    	topic = topics.get(0);
+    	if (readBuf()) {
+			return;
+		}
     }
     
     public ByteMessage poll()throws Exception{
-    	if (flag) {
+    	if (flag){
     		return null;
     	}
     	byte key = buf.get();
-    	//System.out.println(key);
     	while (key == 17) {
     		if (readBuf()) {
     			return null;
@@ -113,38 +107,37 @@ public class Consumer {
     }
     
     public boolean readBuf() throws Exception {
-    	//System.out.println(queue + "queue" + buf.position() + "  buf "+buf.get());
-    	//System.out.println(readPos + "topicsize"+topics.size());
-    	//if (readPos >= topics.size()) {
-    		//flag = true;
-			//return true;
-		//}
-    	File file = new File("data/" + topics.get(readPos) + "+" + index);
-    	//System.out.println("data/" + topics.get(readPos) + "+" + index);
-    	while (!file.exists()) {
-    		index = 0;
-    		readPos += 1;
-    		if (readPos >= topics.size()) {
-    			flag = true;
-   				return true;
-   			}
-   			//topic = topics.get(readPos);   	
-    		file = new File("data/" + topics.get(readPos) + "+" + index);
+    	if (flag){
+    		return true;
     	}
-    	//System.out.println(queue + "queue" + buf.position() + "  buf "+buf.get());
-    	byte[] bytes;
-    	//lock.lock();
-    	RandomAccessFile rf = new RandomAccessFile("data/" + topics.get(readPos) + "+" + index, "r");
-    	//System.out.println("data/" + topics.get(readPos) + "+" + index);
-    	bytes = new byte[rf.readInt()];
+    	File file = new File("data/" + index1 + topic + "+" +index2);
+    	
+    	while (!file.exists()) {
+    		if (index2 != 0) {
+    			index1 ++;
+    			index2 = 0;
+    		} else {
+    			index1 = 0;
+    			index2 = 0;
+    			readPos += 1;
+    			if (readPos >= topics.size()) {
+    				flag = true;
+    				return true;
+    			}
+    			topic = topics.get(readPos);
+    		}
+    		file = new File("data/" + index1 + topic + "+" +index2);
+    	}
+    	
+    	RandomAccessFile rf = new RandomAccessFile(file, "r");
+    	index2++;
+    	byte[] bytes = new byte[rf.readInt()];
     	rf.read(bytes);
     	rf.close();
-    	//lock.unlock();
-    	//bytes = decompress(bytes);
-    	index++;
+    	bytes = decompress(bytes);
     	buf = ByteBuffer.wrap(bytes);
     	
-    	//System.out.println("queueName" + queue);
+    	//System.out.println(buf.position());
     	return false;
     }//readBuf
     
@@ -154,10 +147,7 @@ public class Consumer {
 		buf.get(bs);
 		return new String(bs);
     }//getString
-
-    /**
-     * Created by yangxiao on 2017/11/14.
-     
+    
     public static byte[] decompress(byte[] data) {
         byte[] output = new byte[0];
 
@@ -188,7 +178,5 @@ public class Consumer {
         return output;
     }
     
-   
- * Created by yangxiao on 2017/11/14.
- */
+
 }
