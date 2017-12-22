@@ -171,7 +171,7 @@ public class Consumer {
     	
     	
     	index++;
-    	input = new BufferedInputStream(new FileInputStream(file), 10 * 1024 * 1024);
+    	input = new BufferedInputStream(new FileInputStream(file), 2 * 1024 * 1024);
     	//System.out.println("hello world");
     	
     }
