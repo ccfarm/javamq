@@ -134,7 +134,7 @@ public class Consumer {
     	byte[] bytes = new byte[rf.readInt()];
     	rf.read(bytes);
     	rf.close();
-    	bytes = decompress(bytes);
+    	//bytes = decompress(bytes);
     	buf = ByteBuffer.wrap(bytes);
     	
     	//System.out.println(buf.position());
