@@ -8,7 +8,7 @@ import java.io.*;
 
 public class MessageStore {
 	
-	static final int CAPACITY = 10 * 1024 * 1024;
+	static final int CAPACITY = 20 * 1024 * 1024;
 	//String filename;
 	ByteBuffer buf;
 	//int index;
