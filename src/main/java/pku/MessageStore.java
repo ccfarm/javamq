@@ -37,7 +37,7 @@ public class MessageStore {
 		byte[] bytes = new byte[buf.position()];
 		buf.position(0);
 		buf.get(bytes);
-		//bytes = compress(bytes);
+		bytes = compress(bytes);
 		RandomAccessFile rf = new RandomAccessFile("data/" + filename + "+" +index, "rw");
 		//FileOutputStream rf = new FileOutputStream("data/" + filename + "+" +index, true);
 		index++;
