@@ -12,12 +12,13 @@ import java.util.zip.Inflater;
 
 public class Consumer {
 	ByteBuffer buf = ByteBuffer.allocateDirect(MessageStore.CAPACITY);
+	InputStream input;
 	List<String> topics = new LinkedList<>();
 	String queue;
 	int readPos = 0;
-	int index1 = 0;
-	int index2 = 0;
-	String topic = null;
+	int index = 0;
+	//int index2 = 0;
+	//String topic = null;
 	boolean flag = false;
 	//static HashMap<String, Integer> readPosForMap = new HashMap<>();
 	//static HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
@@ -29,10 +30,9 @@ public class Consumer {
     	}
     	queue = queueName;
     	topics.addAll(t);
-    	topic = topics.get(0);
-    	if (readBuf()) {
-			return;
-		}
+    	//topic = topics.get(0);
+    	readFile();
+    	readBuf();
     }
     
     public ByteMessage poll()throws Exception{
@@ -103,6 +103,7 @@ public class Consumer {
     	byte[] body = new byte[buf.getInt()];
     	buf.get(body);
     	re.setBody(body);
+    	//System.out.println(10086);
         return re;
     }
     
@@ -110,30 +111,21 @@ public class Consumer {
     	if (flag){
     		return true;
     	}
-    	File file = new File("data/" + index1 + topic + "+" +index2);
     	
-    	while (!file.exists()) {
-    		if (index2 != 0) {
-    			index1 ++;
-    			index2 = 0;
-    		} else {
-    			index1 = 0;
-    			index2 = 0;
-    			readPos += 1;
-    			if (readPos >= topics.size()) {
-    				flag = true;
-    				return true;
-    			}
-    			topic = topics.get(readPos);
-    		}
-    		file = new File("data/" + index1 + topic + "+" +index2);
+    	int l = readInt();
+    	
+    	//System.out.println("hello" + l);
+    	
+    	while (l == 0) {
+    		if (flag){
+        		return true;
+        	}
+    		readFile();
     	}
+
     	
-    	RandomAccessFile rf = new RandomAccessFile(file, "r");
-    	index2++;
-    	byte[] bytes = new byte[rf.readInt()];
-    	rf.read(bytes);
-    	rf.close();
+    	byte[] bytes = new byte[l];
+    	input.read(bytes, 0, l);
     	bytes = decompress(bytes);
     	buf = ByteBuffer.wrap(bytes);
     	
@@ -147,6 +139,34 @@ public class Consumer {
 		buf.get(bs);
 		return new String(bs);
     }//getString
+    
+    public int readInt() throws Exception {
+    	byte[] b = new byte[4];
+    	input.read(b, 0, 4);
+    	return b[3] & 0xFF |  
+        (b[2] & 0xFF) << 8 |  
+        (b[1] & 0xFF) << 16 |  
+        (b[0] & 0xFF) << 24;   
+    }
+    
+    public void readFile() throws Exception{
+    	File file = new File("data/" + index + topics.get(readPos));
+    	
+    	while (!file.exists()) {
+    		index = 0;
+    		readPos += 1;
+    		if (readPos >= topics.size()) {
+    			flag = true;
+    			return;
+    		}//if
+    		//topic = topics.get(readPos);
+    		file = new File("data/" + index + topics.get(readPos));
+    	}
+    	index++;
+    	input = new BufferedInputStream(new FileInputStream(file), 5 * 1024 * 1024);
+    	//System.out.println("hello world");
+    	
+    }
     
     public static byte[] decompress(byte[] data) {
         byte[] output = new byte[0];

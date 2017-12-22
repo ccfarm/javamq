@@ -46,7 +46,7 @@ public class Producer {
     	Iterator iter = bufs.entrySet().iterator();
     	while (iter.hasNext()) {
     		Map.Entry<String, MessageStore> entry = (Map.Entry<String, MessageStore>) iter.next();
-    		entry.getValue().write();
+    		entry.getValue().writeEnd();
     	}
         System.out.println(1);
     }

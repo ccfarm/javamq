@@ -1,6 +1,5 @@
 package pku;
 
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.zip.Deflater;
 import java.util.*;
@@ -10,15 +9,20 @@ import java.io.*;
 public class MessageStore {
 	
 	static final int CAPACITY = 4660 * 1024;
-	String filename;
+	//String filename;
 	ByteBuffer buf;
-	int index;
+	//int index;
+	OutputStream output;
+	File file;
 	
 	
-	public MessageStore(String filename) {
-		index = 0;
-		this.filename = filename;
+	public MessageStore(String filename) throws Exception{
+		//index = 0;
+		//this.filename = filename;
 		buf = ByteBuffer.allocateDirect(CAPACITY);
+		file = new File("data/" +filename);
+		//System.out.println("data/" +filename);
+		output = new BufferedOutputStream(new FileOutputStream(file), 5 * 1024 * 1024);
 	}
 	
 	
@@ -38,17 +42,28 @@ public class MessageStore {
 		buf.position(0);
 		buf.get(bytes);
 		bytes = compress(bytes);
-		RandomAccessFile rf = new RandomAccessFile("data/" + filename + "+" +index, "rw");
-		//FileOutputStream rf = new FileOutputStream("data/" + filename + "+" +index, true);
-		index++;
-		rf.writeInt(bytes.length);
-		rf.write(bytes);
-		rf.close();
+		writeInt(bytes.length);
+		output.write(bytes, 0, bytes.length);
+		//output.flush();
 		buf.clear();
 	}
 	
-
+	public void writeEnd() throws Exception {
+		write();
+		writeInt(0);
+		//output.flush();
+		output.close();
+	}
 	
+
+	public void writeInt(int a) throws Exception{
+		byte[] b = new byte[]{
+				(byte) ((a >> 24) & 0xFF),
+				(byte) ((a >> 16) & 0xFF),     
+		        (byte) ((a >> 8) & 0xFF),     
+		        (byte) (a & 0xFF)};  
+		output.write(b, 0, 4);
+	}
 	
 	public void push(ByteMessage defaultMessage) throws Exception{
 		if (defaultMessage == null) {
