@@ -22,7 +22,7 @@ public class MessageStore {
 		buf = ByteBuffer.allocateDirect(CAPACITY);
 		file = new File("data/" +filename);
 		//System.out.println("data/" +filename);
-		output = new BufferedOutputStream(new FileOutputStream(file), 2660 * 1024);
+		output = new BufferedOutputStream(new FileOutputStream(file), 4160 * 1024);
 	}
 	
 	
