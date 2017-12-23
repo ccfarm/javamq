@@ -22,7 +22,7 @@ public class MessageStore {
 		buf = ByteBuffer.allocateDirect(CAPACITY);
 		file = new File("data/" +filename);
 		//System.out.println("data/" +filename);
-		output = new BufferedOutputStream(new FileOutputStream(file), 4160 * 1024);
+		output = new BufferedOutputStream(new FileOutputStream(file), 4660 * 1024);
 	}
 	
 	
@@ -259,7 +259,7 @@ public class MessageStore {
         compresser.finish();
         ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
         try {
-            byte[] buf = new byte[1024];
+            byte[] buf = new byte[1024 * 10];
             while (!compresser.finished()) {
                 int i = compresser.deflate(buf);
                 bos.write(buf, 0, i);
