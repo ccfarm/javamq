@@ -183,7 +183,7 @@ public class Consumer {
 
         ByteArrayOutputStream o = new ByteArrayOutputStream(data.length);
         try {
-            byte[] buf = new byte[1024 * 10];
+            byte[] buf = new byte[1024 * 50];
             while (!decompresser.finished()) {
                 int i = decompresser.inflate(buf);
                 o.write(buf, 0, i);
