@@ -259,7 +259,7 @@ public class MessageStore {
         compresser.finish();
         ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
         try {
-            byte[] buf = new byte[1024 * 10];
+            byte[] buf = new byte[1024 * 50];
             while (!compresser.finished()) {
                 int i = compresser.deflate(buf);
                 bos.write(buf, 0, i);
