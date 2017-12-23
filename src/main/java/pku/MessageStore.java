@@ -9,6 +9,9 @@ import java.io.*;
 public class MessageStore {
 	
 	static final int CAPACITY = 4660 * 1024;
+	static final int BUFOUTPUT = 4660 * 1024;
+	static final int BUFINPUT = 2048 * 1024;
+	static final int COMPRESS = 5 * 1024;
 	//String filename;
 	ByteBuffer buf;
 	//int index;
@@ -22,7 +25,7 @@ public class MessageStore {
 		buf = ByteBuffer.allocateDirect(CAPACITY);
 		file = new File("data/" +filename);
 		//System.out.println("data/" +filename);
-		output = new BufferedOutputStream(new FileOutputStream(file), 4660 * 1024);
+		output = new BufferedOutputStream(new FileOutputStream(file), BUFOUTPUT);
 	}
 	
 	
@@ -259,7 +262,7 @@ public class MessageStore {
         compresser.finish();
         ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
         try {
-            byte[] buf = new byte[1024 * 50];
+            byte[] buf = new byte[COMPRESS];
             while (!compresser.finished()) {
                 int i = compresser.deflate(buf);
                 bos.write(buf, 0, i);
