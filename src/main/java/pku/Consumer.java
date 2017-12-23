@@ -169,7 +169,7 @@ public class Consumer {
     	
     	
     	index++;
-    	input = new BufferedInputStream(new FileInputStream(file), 2048 * 1024);
+    	input = new BufferedInputStream(new FileInputStream(file), 3000 * 1024);
     	//System.out.println("hello world");
     	
     }
