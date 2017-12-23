@@ -39,67 +39,65 @@ public class Consumer {
     	if (flag){
     		return null;
     	}
-    	byte key = buf.get();
-    	while (key == 17) {
+    	short key = buf.getShort();
+    	while (key == -1) {
     		if (readBuf()) {
     			return null;
     		}
-    		key = buf.get();
+    		key = buf.getShort();
     	}
     	ByteMessage re = new DefaultMessage();
-    	while (key != 18) {
-    		switch (key) {
-    		case 1:
-    			re.putHeaders(MessageHeader.MESSAGE_ID, buf.getInt());
-    			break;
-    		case 2:
-    			re.putHeaders(MessageHeader.TOPIC, getString());
-    			break;
-    		case 3:
-    			re.putHeaders(MessageHeader.BORN_TIMESTAMP, buf.getLong());
-    			break;
-    		case 4:
-    			re.putHeaders(MessageHeader.BORN_HOST, getString());
-    			break;
-    		case 5:
-    			re.putHeaders(MessageHeader.STORE_TIMESTAMP, buf.getLong());
-    			break;
-    		case 6:
-    			re.putHeaders(MessageHeader.STORE_HOST, getString());
-    			break;
-    		case 7:
-    			re.putHeaders(MessageHeader.START_TIME, buf.getLong());
-    			break;
-    		case 8:
-    			re.putHeaders(MessageHeader.STOP_TIME, buf.getLong());
-    			break;
-    		case 9:
-    			re.putHeaders(MessageHeader.TIMEOUT, buf.getInt());
-    			break;
-    		case 10:
-    			re.putHeaders(MessageHeader.PRIORITY, buf.getInt());
-    			break;
-    		case 11:
-    			re.putHeaders(MessageHeader.RELIABILITY, buf.getInt());
-    			break;
-    		case 12:
-    			re.putHeaders(MessageHeader.SEARCH_KEY, getString());
-    			break;
-    		case 13:
-    			re.putHeaders(MessageHeader.SCHEDULE_EXPRESSION, getString());
-    			break;
-    		case 14:
-    			re.putHeaders(MessageHeader.SHARDING_KEY, buf.getDouble());
-    			break;
-    		case 15:
-    			re.putHeaders(MessageHeader.SHARDING_PARTITION, buf.getDouble());
-    			break;
-    		case 16:
-    			re.putHeaders(MessageHeader.TRACE_ID, getString());
-    			break;
-    		}//switch
-    		key = buf.get();
-    	}//while
+    	
+    	re.putHeaders(MessageHeader.TOPIC, topics.get(readPos));
+    	
+    	if ((key >> 14 & 1) == 1) {
+			re.putHeaders(MessageHeader.MESSAGE_ID, buf.getInt());
+		}
+		if ((key >> 13 & 1) == 1) {
+			re.putHeaders(MessageHeader.BORN_TIMESTAMP, buf.getLong());
+
+		}
+		if ((key >> 12 & 1) == 1) {
+			re.putHeaders(MessageHeader.BORN_HOST, getString());
+			
+		}
+		if ((key >> 11 & 1) == 1) {
+			re.putHeaders(MessageHeader.STORE_TIMESTAMP, buf.getLong());
+		}
+		if ((key >> 10 & 1) == 1) {
+			re.putHeaders(MessageHeader.STORE_HOST, getString());
+		}
+		if ((key >> 9 & 1) == 1) {
+			re.putHeaders(MessageHeader.START_TIME, buf.getLong());
+		}
+		if ((key >> 8 & 1) == 1) {
+			re.putHeaders(MessageHeader.STOP_TIME, buf.getLong());
+		}
+		if ((key >> 7 & 1) == 1) {
+			re.putHeaders(MessageHeader.TIMEOUT, buf.getInt());
+		}
+		if ((key >> 6 & 1) == 1) {
+			re.putHeaders(MessageHeader.PRIORITY, buf.getInt());
+		}
+		if ((key >> 5 & 1) == 1) {
+			re.putHeaders(MessageHeader.RELIABILITY, buf.getInt());
+		}
+		if ((key >> 4 & 1) == 1) {
+			re.putHeaders(MessageHeader.SEARCH_KEY, getString());
+		}
+		if ((key >> 3 & 1) == 1) {
+			re.putHeaders(MessageHeader.SCHEDULE_EXPRESSION, getString());
+		}
+		if ((key >> 2 & 1) == 1) {
+			re.putHeaders(MessageHeader.SHARDING_KEY, buf.getDouble());
+		}
+		if ((key >> 1 & 1) == 1) {
+			re.putHeaders(MessageHeader.SHARDING_PARTITION, buf.getDouble());
+		}
+		if ((key & 1) == 1) {
+			re.putHeaders(MessageHeader.TRACE_ID, getString());
+		}
+    	
     	byte[] body = new byte[buf.getInt()];
     	buf.get(body);
     	re.setBody(body);
@@ -171,7 +169,7 @@ public class Consumer {
     	
     	
     	index++;
-    	input = new BufferedInputStream(new FileInputStream(file), 5 * 1024 * 1024);
+    	input = new BufferedInputStream(new FileInputStream(file), 2148 * 1024);
     	//System.out.println("hello world");
     	
     }

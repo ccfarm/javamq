@@ -37,7 +37,7 @@ public class MessageStore {
 			return;
 		}
 		
-		buf.put((byte)17);//17 means to be continue
+		buf.putShort((short)-1);//17 means to be continue
 		byte[] bytes = new byte[buf.position()];
 		buf.position(0);
 		buf.get(bytes);
@@ -70,106 +70,176 @@ public class MessageStore {
 			return;
 		}
 		
-		int v1 = 0;
-		long v2 = 0;
-		String v3 = null;
-		double v4 = 0;
+
+		short key = 0;
+		int v1 =0;
 		if (defaultMessage.headers().containsKey(MessageHeader.MESSAGE_ID)) {
 			v1 = defaultMessage.headers().getInt(MessageHeader.MESSAGE_ID);
-			buf.put((byte)1);
-			buf.putInt(v1);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
 		}
 		
-		if (defaultMessage.headers().containsKey(MessageHeader.TOPIC)) {
-			v3 = defaultMessage.headers().getString(MessageHeader.TOPIC);
-			buf.put((byte)2);
-			putString(v3);
-		}
-		
+		//if (defaultMessage.headers().containsKey(MessageHeader.TOPIC)) {
+			//v3 = defaultMessage.headers().getString(MessageHeader.TOPIC);
+			//buf.put((byte)2);
+			//putString(v3);
+		//}
+		long v2 = 0;
 		if (defaultMessage.headers().containsKey(MessageHeader.BORN_TIMESTAMP)) {
 			v2 = defaultMessage.headers().getLong(MessageHeader.BORN_TIMESTAMP);
-			buf.put((byte)3);
-			buf.putLong(v2);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
 		}
 		
+		String v3 = null;
 		if (defaultMessage.headers().containsKey(MessageHeader.BORN_HOST)) {
 			v3 = defaultMessage.headers().getString(MessageHeader.BORN_HOST);
-			buf.put((byte)4);
-			putString(v3);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
 		}
 		
+		long v4 = 0;
 		if (defaultMessage.headers().containsKey(MessageHeader.STORE_TIMESTAMP)) {
-			v2 = defaultMessage.headers().getLong(MessageHeader.STORE_TIMESTAMP);
-			buf.put((byte)5);
-			buf.putLong(v2);
+			v4 = defaultMessage.headers().getLong(MessageHeader.STORE_TIMESTAMP);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
 		}
 		
+		String v5 = null;
 		if (defaultMessage.headers().containsKey(MessageHeader.STORE_HOST)) {
-			v3 = defaultMessage.headers().getString(MessageHeader.STORE_HOST);
-			buf.put((byte)6);
-			putString(v3);
+			v5 = defaultMessage.headers().getString(MessageHeader.STORE_HOST);
+
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
 		}
 		
+		long v6 = 0;
 		if (defaultMessage.headers().containsKey(MessageHeader.START_TIME)) {
-			v2 = defaultMessage.headers().getLong(MessageHeader.START_TIME);
-			buf.put((byte)7);
-			buf.putLong(v2);
+			v6 = defaultMessage.headers().getLong(MessageHeader.START_TIME);
+
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
 		}
 		
+		long v7 = 0;
 		if (defaultMessage.headers().containsKey(MessageHeader.STOP_TIME)) {
-			v2 = defaultMessage.headers().getLong(MessageHeader.STOP_TIME);
-			buf.put((byte)8);
+			v7 = defaultMessage.headers().getLong(MessageHeader.STOP_TIME);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
+		}
+		
+		int v8 = 0;
+		if (defaultMessage.headers().containsKey(MessageHeader.TIMEOUT)) {
+			v8 = defaultMessage.headers().getInt(MessageHeader.TIMEOUT);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
+		}
+		
+		int v9 = 0;
+		if (defaultMessage.headers().containsKey(MessageHeader.PRIORITY)) {
+			v9 = defaultMessage.headers().getInt(MessageHeader.PRIORITY);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
+		}
+		
+		int v10 = 0;
+		if (defaultMessage.headers().containsKey(MessageHeader.RELIABILITY)) {
+			v10 = defaultMessage.headers().getInt(MessageHeader.RELIABILITY);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
+		}
+		
+		String v11 = null;
+		if (defaultMessage.headers().containsKey(MessageHeader.SEARCH_KEY)) {
+			v11 = defaultMessage.headers().getString(MessageHeader.SEARCH_KEY);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
+		}
+		String v12 = null;
+		if (defaultMessage.headers().containsKey(MessageHeader.SCHEDULE_EXPRESSION)) {
+			v12 = defaultMessage.headers().getString(MessageHeader.SCHEDULE_EXPRESSION);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
+		}
+		
+		double v13 = 0;
+		if (defaultMessage.headers().containsKey(MessageHeader.SHARDING_KEY)) {
+			v13 = defaultMessage.headers().getDouble(MessageHeader.SHARDING_KEY);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
+		}
+		double v14 = 0;
+		if (defaultMessage.headers().containsKey(MessageHeader.SHARDING_PARTITION)) {
+			v14 = defaultMessage.headers().getDouble(MessageHeader.SHARDING_PARTITION);
+			key = (short)((key | 1) << 1);
+		} else {
+			key = (short)(key<< 1);
+		}
+		String v15 = null;
+		if (defaultMessage.headers().containsKey(MessageHeader.TRACE_ID)) {
+			v15 = defaultMessage.headers().getString(MessageHeader.TRACE_ID);
+			key = (short)(key | 1);
+		} 
+		//buf.put((byte)18);//18 means the start of the body of this message
+		buf.putShort(key);
+		if ((key >> 14 & 1) == 1) {
+			buf.putInt(v1);
+		}
+		if ((key >> 13 & 1) == 1) {
 			buf.putLong(v2);
 		}
-		
-		if (defaultMessage.headers().containsKey(MessageHeader.TIMEOUT)) {
-			v1 = defaultMessage.headers().getInt(MessageHeader.TIMEOUT);
-			buf.put((byte)9);
-			buf.putInt(v1);
-		}
-		
-		if (defaultMessage.headers().containsKey(MessageHeader.PRIORITY)) {
-			v1 = defaultMessage.headers().getInt(MessageHeader.PRIORITY);
-			buf.put((byte)10);
-			buf.putInt(v1);
-		}
-		
-		if (defaultMessage.headers().containsKey(MessageHeader.RELIABILITY)) {
-			v1 = defaultMessage.headers().getInt(MessageHeader.RELIABILITY);
-			buf.put((byte)11);
-			buf.putInt(v1);
-		}
-		
-		if (defaultMessage.headers().containsKey(MessageHeader.SEARCH_KEY)) {
-			v3 = defaultMessage.headers().getString(MessageHeader.SEARCH_KEY);
-			buf.put((byte)12);
+		if ((key >> 12 & 1) == 1) {
 			putString(v3);
 		}
-		
-		if (defaultMessage.headers().containsKey(MessageHeader.SCHEDULE_EXPRESSION)) {
-			v3 = defaultMessage.headers().getString(MessageHeader.SCHEDULE_EXPRESSION);
-			buf.put((byte)13);
-			putString(v3);
+		if ((key >> 11 & 1) == 1) {
+			buf.putLong(v4);
 		}
-		
-		if (defaultMessage.headers().containsKey(MessageHeader.SHARDING_KEY)) {
-			v4 = defaultMessage.headers().getDouble(MessageHeader.SHARDING_KEY);
-			buf.put((byte)14);
-			buf.putDouble(v4);
+		if ((key >> 10 & 1) == 1) {
+			putString(v5);
 		}
-		
-		if (defaultMessage.headers().containsKey(MessageHeader.SHARDING_PARTITION)) {
-			v4 = defaultMessage.headers().getDouble(MessageHeader.SHARDING_PARTITION);
-			buf.put((byte)15);
-			buf.putDouble(v4);
+		if ((key >> 9 & 1) == 1) {
+			buf.putLong(v6);
 		}
-		
-		if (defaultMessage.headers().containsKey(MessageHeader.TRACE_ID)) {
-			v3 = defaultMessage.headers().getString(MessageHeader.TRACE_ID);
-			buf.put((byte)16);
-			putString(v3);
+		if ((key >> 8 & 1) == 1) {
+			buf.putLong(v7);
 		}
-		buf.put((byte)18);//18 means the start of the body of this message
+		if ((key >> 7 & 1) == 1) {
+			buf.putInt(v8);
+		}
+		if ((key >> 6 & 1) == 1) {
+			buf.putInt(v9);
+		}
+		if ((key >> 5 & 1) == 1) {
+			buf.putInt(v10);
+		}
+		if ((key >> 4 & 1) == 1) {
+			putString(v11);
+		}
+		if ((key >> 3 & 1) == 1) {
+			putString(v12);
+		}
+		if ((key >> 2 & 1) == 1) {
+			buf.putDouble(v13);
+		}
+		if ((key >> 1 & 1) == 1) {
+			buf.putDouble(v14);
+		}
+		if ((key & 1) == 1) {
+			putString(v15);
+		}
 		buf.putInt(defaultMessage.getBody().length);
 		buf.put(defaultMessage.getBody());
 		
@@ -183,7 +253,7 @@ public class MessageStore {
         byte[] output = new byte[0];
 
         Deflater compresser = new Deflater();
-
+        //compresser.setLevel(1);
         compresser.reset();
         compresser.setInput(data);
         compresser.finish();
