@@ -257,7 +257,7 @@ public class MessageStore {
 
         Deflater compresser = new Deflater();
         compresser.setLevel(1);
-		compress.setStrategy(2);
+		//compress.setStrategy(2);
         compresser.reset();
         compresser.setInput(data);
         compresser.finish();
