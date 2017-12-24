@@ -8,7 +8,7 @@ import java.io.*;
 
 public class MessageStore {
 	
-	static final int CAPACITY = 4660 * 1024;
+	static final int CAPACITY = 8660 * 1024;
 	static final int BUFOUTPUT = 4660 * 1024;
 	static final int BUFINPUT = 2048 * 1024;
 	static final int COMPRESS = 10 * 1024;
