@@ -256,7 +256,7 @@ public class MessageStore {
         byte[] output = new byte[0];
 
         Deflater compresser = new Deflater();
-        compresser.setLevel(9);
+        compresser.setLevel(0);
         compresser.reset();
         compresser.setInput(data);
         compresser.finish();
