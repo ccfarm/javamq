@@ -15,7 +15,7 @@ public class MessageStore {
 	//String filename;
 	ByteBuffer buf;
 	//int index;
-	OutputStream output;
+	RandomAccessFile output;
 	File file;
 	
 	
@@ -25,7 +25,7 @@ public class MessageStore {
 		buf = ByteBuffer.allocateDirect(CAPACITY);
 		file = new File("data/" +filename);
 		//System.out.println("data/" +filename);
-		output = new BufferedOutputStream(new FileOutputStream(file), BUFOUTPUT);
+		output = new RandomAccessFile(file, "rw");
 	}
 	
 	
