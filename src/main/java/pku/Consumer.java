@@ -157,7 +157,6 @@ public class Consumer {
     	File file = new File("data/" + index + topics.get(readPos));
     	
     	while (!file.exists()) {
-    		index = 0;
     		readPos += 1;
     		if (readPos >= topics.size()) {
     			flag = true;
@@ -169,7 +168,7 @@ public class Consumer {
     	
     	
     	index++;
-    	input =new RandomAccessFile(file, "r");
+    	input =new BufferedRandomAccessFile(file, "r", MessageStore.BUFINPUT);
     	//System.out.println("hello world");
     	
     }
