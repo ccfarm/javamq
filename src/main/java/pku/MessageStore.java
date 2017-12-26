@@ -12,6 +12,7 @@ public class MessageStore {
 	static final int BUFOUTPUT = 4660 * 1024;
 	static final int BUFINPUT = 2048 * 1024;
 	static final int COMPRESS = 5 * 1024;
+	static final int DECOMPRESS = 1 * 1024;
 	//String filename;
 	ByteBuffer buf;
 	RandomAccessFile output;
