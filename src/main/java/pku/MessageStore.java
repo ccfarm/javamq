@@ -15,7 +15,7 @@ public class MessageStore {
 	//String filename;
 	ByteBuffer buf;
 	//int index;
-	BufferedRandomAccessFile output;
+	RandomAccessFile output;
 	File file;
 	
 	
@@ -25,7 +25,7 @@ public class MessageStore {
 		buf = ByteBuffer.allocateDirect(CAPACITY);
 		file = new File("data/" +filename);
 		//System.out.println("data/" +filename);
-		output = new BufferedRandomAccessFile(file, "rw", MessageStore.BUFOUTPUT);
+		output = new RandomAccessFile(file, "rw");
 	}
 	
 	
@@ -65,7 +65,7 @@ public class MessageStore {
 				(byte) ((a >> 16) & 0xFF),     
 		        (byte) ((a >> 8) & 0xFF),     
 		        (byte) (a & 0xFF)};  
-		output.write(b);
+		output.write(b, 0 ,4);
 	}
 	
 	public void push(ByteMessage defaultMessage) throws Exception{
