@@ -165,7 +165,7 @@ public class Consumer {
     		}//if
     		//topic = topics.get(readPos);
     		file = new File("data/" + index + topics.get(readPos));
-    		System.out.println("data/" + index + topics.get(readPos));
+    		//System.out.println("data/" + index + topics.get(readPos));
     	}
     	
     	//System.out.println("HHHHHHHHHHHHHHHHHHHHdata/" + index + topics.get(readPos));
