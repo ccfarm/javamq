@@ -15,7 +15,7 @@ public class MessageStore {
 	//String filename;
 	ByteBuffer buf;
 	//int index;
-	RandomAccessFile output;
+	BufferedRandomAccessFile output;
 	File file;
 	
 	
@@ -65,7 +65,7 @@ public class MessageStore {
 				(byte) ((a >> 16) & 0xFF),     
 		        (byte) ((a >> 8) & 0xFF),     
 		        (byte) (a & 0xFF)};  
-		output.write(b, 0, 4);
+		output.write(b);
 	}
 	
 	public void push(ByteMessage defaultMessage) throws Exception{
