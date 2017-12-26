@@ -12,7 +12,7 @@ import java.util.zip.Inflater;
 
 public class Consumer {
 	ByteBuffer buf = ByteBuffer.allocateDirect(MessageStore.CAPACITY);
-	RandomAccessFile input;
+	InputStream input;
 	List<String> topics = new LinkedList<>();
 	String queue;
 	int readPos = 0;
@@ -165,12 +165,11 @@ public class Consumer {
     		}//if
     		//topic = topics.get(readPos);
     		file = new File("data/" + index + topics.get(readPos));
-    		//System.out.println("data/" + index + topics.get(readPos));
     	}
     	
-    	//System.out.println("HHHHHHHHHHHHHHHHHHHHdata/" + index + topics.get(readPos));
+    	
     	index++;
-    	input =new RandomAccessFile(file, "r");
+    	input = new BufferedInputStream(new FileInputStream(file), MessageStore.BUFINPUT);
     	//System.out.println("hello world");
     	
     }
