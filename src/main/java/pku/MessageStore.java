@@ -12,7 +12,7 @@ public class MessageStore {
 	static final int BUFOUTPUT = 4660 * 1024;
 	static final int BUFINPUT = 2048 * 1024;
 	static final int COMPRESS = 5 * 1024;
-	static final int DECOMPRESS = 1 * 1024;
+	static final int DECOMPRESS = 5 * 1024;
 	//String filename;
 	ByteBuffer buf;
 	RandomAccessFile output;
@@ -64,6 +64,7 @@ public class MessageStore {
 	}
 	
 	public void flush() throws Exception {
+		//output.writeInt(buf2.length);
 		output.write(buf2, 0, pos);
 		pos = 0;
 	}

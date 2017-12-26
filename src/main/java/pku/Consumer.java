@@ -20,11 +20,6 @@ public class Consumer {
 	//int index2 = 0;
 	//String topic = null;
 	boolean flag = false;
-	boolean readEnd = false;
-	//byte[] buf2 = new byte[100];
-	byte[] buf2 = new byte[MessageStore.BUFINPUT + 5 * 1024 * 1024];
-	int pos1 = 0;
-	int pos2 = 0;
 	//static HashMap<String, Integer> readPosForMap = new HashMap<>();
 	//static HashMap<String, ArrayList<ByteMessage>> store = new HashMap<>();
 	
@@ -37,12 +32,6 @@ public class Consumer {
     	topics.addAll(t);
     	//topic = topics.get(0);
     	readFile();
-    	if (flag){
-    		return;
-    	}
-    	//input.getFilePointer();
-    	//input.length();
-    	//flush();
     	readBuf();
     }
     
@@ -117,32 +106,27 @@ public class Consumer {
     }
     
     public boolean readBuf() throws Exception {
-    	if ((pos2 - pos1 < 1 * 1024 * 1024)  && (!readEnd)){
-    		flush();
-    	}
     	if (flag){
     		return true;
     	}
     	
-    	int l = readInt2();
+    	int l = readInt();
     	
     	//if ( l == 0) { System.out.println(topics.get(readPos));}
     	
     	while (l == -1) {
-
+    		
     		readFile();
     		
     		if (flag){
         		return true;
         	}
-    		l = readInt2();
+    		l = readInt();
     	}
 
     	
     	byte[] bytes = new byte[l];
-    	//input.read(bytes, 0, l);
-    	System.arraycopy(buf2, pos1, bytes, 0, l);
-    	pos1 += l;
+    	input.read(bytes, 0, l);
     	bytes = decompress(bytes);
     	buf = ByteBuffer.wrap(bytes);
     	
@@ -156,40 +140,6 @@ public class Consumer {
 		buf.get(bs);
 		return new String(bs);
     }//getString
-    
-    public void flush() throws Exception{
-    	//input.length();
-    	if (pos2 != 0) {
-    		System.arraycopy(buf2, pos1, buf2, 0, pos2 - pos1);
-    		//pos1 = 0;
-    		pos2 = pos2 - pos1;
-    		pos1 = 0;
-    	}
-    	int l;
-    	//input.length();
-    	//input.getFilePointer();
-    	if (input.length() - input.getFilePointer() > MessageStore.BUFINPUT) {
-    		l = MessageStore.BUFINPUT;
-    	} else {
-    		l = (int)(input.length() - input.getFilePointer());
-    		readEnd = true;
-    	}
-    	
-    	input.read(buf2, pos2, l);
-    	pos2 += l;
-    }
-    
-    
-    public int readInt2() throws Exception {
-    	byte[] b = new byte[4];
-    	//input.read(b, 0, 4);
-    	System.arraycopy(buf2, pos1, b, 0, 4);
-    	pos1 += 4;
-    	return b[3] & 0xFF |  
-        (b[2] & 0xFF) << 8 |  
-        (b[1] & 0xFF) << 16 |  
-        (b[0] & 0xFF) << 24;   
-    }
     
     public int readInt() throws Exception {
     	byte[] b = new byte[4];
@@ -221,10 +171,8 @@ public class Consumer {
     	//System.out.println("HHHHHHHHHHHHHHHHHHHHdata/" + index + topics.get(readPos));
     	index++;
     	input =new RandomAccessFile(file, "r");
-		pos2 = pos1 = 0;
-    	flush();
-    	//System.out.println("hello world" + input.length());
-    	//input.length();
+    	//System.out.println("hello world");
+    	
     }
     
     public static byte[] decompress(byte[] data) {
@@ -259,3 +207,4 @@ public class Consumer {
     
 
 }
+
