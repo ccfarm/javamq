@@ -28,7 +28,7 @@ public class MessageStore {
 		file = new File("data/" +filename);
 		//System.out.println("data/" +filename);
 		output = new RandomAccessFile(file, "rw");
-		buf2 = new byte[BUFOUTPUT + 10 * 1024 * 1024];
+		buf2 = new byte[BUFOUTPUT + 5 * 1024 * 1024];
 		pos = 0;
 	}
 	
