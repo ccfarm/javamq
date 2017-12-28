@@ -12,13 +12,11 @@ public class MessageStore {
 	static final int BUFOUTPUT = 4660 * 1024;
 	static final int BUFINPUT = 2048 * 1024;
 	static final int COMPRESS = 5 * 1024;
-	static final int DECOMPRESS = 5 * 1024;
 	//String filename;
 	ByteBuffer buf;
-	RandomAccessFile output;
+	//int index;
+	OutputStream output;
 	File file;
-	byte[] buf2;
-	int pos;
 	
 	
 	public MessageStore(String filename) throws Exception{
@@ -27,9 +25,7 @@ public class MessageStore {
 		buf = ByteBuffer.allocateDirect(CAPACITY);
 		file = new File("data/" +filename);
 		//System.out.println("data/" +filename);
-		output = new RandomAccessFile(file, "rw");
-		buf2 = new byte[BUFOUTPUT + 5 * 1024 * 1024];
-		pos = 0;
+		output = new BufferedOutputStream(new FileOutputStream(file), BUFOUTPUT);
 	}
 	
 	
@@ -49,32 +45,15 @@ public class MessageStore {
 		buf.position(0);
 		buf.get(bytes);
 		bytes = compress(bytes);
-		//System.out.println("hello" + bytes.length);
-		System.arraycopy(turnInt(bytes.length), 0, buf2, pos, 4);
-		pos += 4;
-		System.arraycopy(bytes, 0, buf2, pos, bytes.length);
-		pos += bytes.length;
-		if (pos > BUFOUTPUT) {
-			flush();
-		}
-		//writeInt(bytes.length);
-		//output.write(bytes, 0, bytes.length);
+		writeInt(bytes.length);
+		output.write(bytes, 0, bytes.length);
 		//output.flush();
 		buf.clear();
 	}
 	
-	public void flush() throws Exception {
-		//output.writeInt(buf2.length);
-		output.write(buf2, 0, pos);
-		pos = 0;
-	}
-	
 	public void writeEnd() throws Exception {
 		write();
-		System.arraycopy(turnInt(-1), 0, buf2, pos, 4);
-		pos += 4;
-		flush();
-		//writeInt(-1);
+		writeInt(-1);
 		//output.flush();
 		output.close();
 	}
@@ -86,16 +65,7 @@ public class MessageStore {
 				(byte) ((a >> 16) & 0xFF),     
 		        (byte) ((a >> 8) & 0xFF),     
 		        (byte) (a & 0xFF)};  
-		output.write(b);
-	}
-	
-	public byte[] turnInt(int a) throws Exception{
-		byte[] b = new byte[]{
-				(byte) ((a >> 24) & 0xFF),
-				(byte) ((a >> 16) & 0xFF),     
-		        (byte) ((a >> 8) & 0xFF),     
-		        (byte) (a & 0xFF)};  
-		return b;
+		output.write(b, 0, 4);
 	}
 	
 	public void push(ByteMessage defaultMessage) throws Exception{
